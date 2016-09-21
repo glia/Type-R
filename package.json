@@ -7,10 +7,10 @@
     "test": "tests"
   },
   "scripts": {
-    "test":  "tests/nestedtypes/node_modules/.bin/mocha tests/nestedtypes/functionality",
+    "test": "tests/nestedtypes/node_modules/.bin/mocha tests/nestedtypes/functionality",
     "build": "node_modules/.bin/webpack",
     "watch": "node_modules/.bin/webpack --watch",
-    "docs" : "typedoc --options typedoc.json ./src/"
+    "docs": "typedoc --options typedoc.json ./src/"
   },
   "repository": {
     "type": "git",
@@ -31,8 +31,9 @@
   },
   "homepage": "https://github.com/gaperton/TransactionalJS#readme",
   "devDependencies": {
+    "rollup-plugin-typescript": "^0.8.1",
+    "source-map-loader": "*",
     "ts-loader": "^0.8.2",
-    "source-map-loader" : "*",
     "typescript": "^1.8.10",
     "webpack": "^1.13.0"
   }

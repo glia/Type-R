@@ -1,6 +1,6 @@
-import Mixins = require( './mixins' )
-import tools = require( './tools' );
-import _eventsApi = require( './events-api' );
+import * as Mixins from './mixins'
+import * as tools from './tools'
+import * as _eventsApi from './events-api'
 import { EventMap, EventsDefinition } from './events-api'
 
 const { mixins, define, extendable } = Mixins,
