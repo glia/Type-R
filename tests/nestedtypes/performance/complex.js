@@ -39,7 +39,7 @@ define( function( require, exports, module ){
 
                 function callback(){ this._counter++; }
 
-                for( var i = 0; i < 1000000; i++ ){
+                for( var i = 0; i < 200000; i++ ){
                     source.on( 'change', callback, d1 )
                         .on( 'change', callback, d2 )
                         .on( 'change', callback, d3 )
@@ -67,7 +67,7 @@ define( function( require, exports, module ){
                         .on( 'change', callback, d4 )
                         .on( 'change', callback, d5 );
 
-                for( var i = 0; i < 1000000; i++ ){
+                for( var i = 0; i < 200000; i++ ){
                     source.trigger( 'change', source, {} );
                 }
             });
@@ -79,7 +79,7 @@ define( function( require, exports, module ){
 
                 function callback(){ this._counter++; }
 
-                for( var i = 0; i < 1000000; i++ ){
+                for( var i = 0; i < 100000; i++ ){
                     d1.listenTo( source, 'change', callback );
                     d2.listenTo( source, 'change', callback );
                     d3.listenTo( source, 'change', callback );

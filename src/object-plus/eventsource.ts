@@ -117,48 +117,54 @@ function getBubblingHandler( event : string ){
 }
 
 export interface HandlersByEvent {
-    [ name : string ] : EventHandler
+    [ name : string ] : EventHandler[]
 }
 
 export class EventHandler {
     constructor( public callback : Callback, public context : any, public next = null ){}
 }
 
-function listOff( head : EventHandler, callback : Callback, context : any ) : EventHandler {
-    let res;
+function listOff( head : EventHandler[], callback : Callback, context : any ) : EventHandler[] {
+    let res = [];
 
-    for( let ev = head; ev; ev = ev.next ){
+    for( let ev of head ){
         if( ( callback && callback !== ev.callback && callback !== ev.callback._callback ) ||
             ( context && context !== ev.context ) ){
-            res = new EventHandler( ev.callback, ev.context, res );
+            res.push( new EventHandler( ev.callback, ev.context, res ) );
         }
     }
 
     return res;
 }
 
-function listSend( head : EventHandler, args ){
-    for( let ev = head; ev; ev = ev.next ) ev.callback.apply( ev.context, args );
+function listSend( head : EventHandler[], args ){
+    if( head )
+    for( let ev of head ) ev.callback.apply( ev.context, args );
 }
 
-function listSend0( head : EventHandler, ){
-    for( let ev = head; ev; ev = ev.next ) ev.callback.call( ev.context );
+function listSend0( head : EventHandler[], ){
+    if( head )
+    for( let ev of head ) ev.callback.call( ev.context );
 }
 
-function listSend1( head : EventHandler, a ){
-    for( let ev = head; ev; ev = ev.next ) ev.callback.call( ev.context, a );
+function listSend1( head : EventHandler[], a ){
+    if( head )
+    for( let ev of head ) ev.callback.call( ev.context, a );
 }
 
-function listSend2( head : EventHandler, a, b ){
-    for( let ev = head; ev; ev = ev.next ) ev.callback.call( ev.context, a, b );
+function listSend2( head : EventHandler[], a, b ){
+    if( head )
+    for( let ev of head ) ev.callback.call( ev.context, a, b );
 }
 
-function listSend3( head : EventHandler, a, b, c ){
-    for( let ev = head; ev; ev = ev.next ) ev.callback.call( ev.context, a, b, c );
+function listSend3( head : EventHandler[], a, b, c ){
+    if( head )
+    for( let ev of head ) ev.callback.call( ev.context, a, b, c );
 }
 
-function listSend4( head : EventHandler, a, b, c, d ){
-    for( let ev = head; ev; ev = ev.next ) ev.callback.call( ev.context, a, b, c, d );
+function listSend4( head : EventHandler[], a, b, c, d ){
+    if( head )
+    for( let ev of head ) ev.callback.call( ev.context, a, b, c, d );
 }
 
 interface Callback extends Function {
@@ -167,8 +173,13 @@ interface Callback extends Function {
 
 export function on( source : EventSource, name : string, callback : Callback, context? : any ) : void {
     if( callback ){
-        const _events = source._events || ( source._events = Object.create( null ) );
-        _events[ name ] = new EventHandler( callback, context, _events[ name ] );
+        const _events : HandlersByEvent = source._events || ( source._events = {} );
+        if( _events[ name ] ){
+            _events[ name ].push( new EventHandler( callback, context, _events[ name ] ) );
+        }
+        else{
+            _events[ name ] = [ new EventHandler( callback, context, _events[ name ] ) ];
+        }
     }
 }
 
@@ -192,7 +203,7 @@ export function off( source : EventSource, name? : string, callback? : Callback,
                 _events[ name ] = listOff( _events[ name ], callback, context );
             }
             else{
-                const filteredEvents = Object.create( null );
+                const filteredEvents = {};
 
                 for( let name in _events ){
                     const queue = listOff( _events[ name ], callback, context );

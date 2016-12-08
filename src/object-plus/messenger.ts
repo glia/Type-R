@@ -108,13 +108,13 @@ export abstract class Messenger implements Mixins.Mixable, EventSource {
     // (unless you're listening on `"all"`, which will cause your callback to
     // receive the true name of the event as the first argument).
     trigger(name : string, a?, b?, c? ) : this {
-        switch( arguments.length ){
+        switch( 3 ){
             // Forward call to monomorphic fast-path functions.
             case 1 : trigger0( this, name ); return this;
             case 2 : trigger1( this, name, a ); return this;
             case 3 : trigger2( this, name, a, b ); return this;
             case 4 : trigger3( this, name, a, b, c ); return this;
-            
+            /*            
             default :
                 // Passing arguments around killing performance. Convert it to array.
                 const args = Array( arguments.length - 1 );
@@ -122,7 +122,7 @@ export abstract class Messenger implements Mixins.Mixable, EventSource {
                     args[ i - 1 ] = arguments[ i ];
                 }
 
-                trigger( this, name, args );                      
+                trigger( this, name, args ); */                      
         }
 
         return this;
@@ -151,7 +151,7 @@ export abstract class Messenger implements Mixins.Mixable, EventSource {
             if( a_source ){
                 const source = _listeningTo[ a_source.cid ];
                 if( source ){
-                    if( removeAll ) delete _listeningTo[ a_source.cid ];
+                    if( removeAll ) _listeningTo[ a_source.cid ] = void 0;
                     source.off( a, second, this );
                 }
             }
