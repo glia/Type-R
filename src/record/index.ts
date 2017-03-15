@@ -89,7 +89,7 @@ declare global {
     }
 }
 
-Object.defineProperties( Date, {
+tools.addProperties( Date, {
     microsoft : {
         get(){
             return new ChainableAttributeSpec({
@@ -129,8 +129,8 @@ if( typeof window !== 'undefined' ){
 
 /** @private */
 export function createSharedTypeSpec( Constructor, Attribute ){
-    Constructor.hasOwnProperty( 'shared' ) ||
-        Object.defineProperty( Constructor, 'shared', {
+    tools.addProperties( Constructor, {
+        shared : {
             get(){
                 return new ChainableAttributeSpec({
                     value : null,
@@ -138,5 +138,6 @@ export function createSharedTypeSpec( Constructor, Attribute ){
                     _attribute : Attribute
                 });
             }
-        });
+        }
+    } );
 }

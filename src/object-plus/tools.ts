@@ -248,6 +248,12 @@ export function getPropertyDescriptor( obj : {}, prop : string ) : PropertyDescr
     return desc;
 }
 
+export function addProperties( target : Object, props : PropertyDescriptorMap ){
+    Object.defineProperties( target, transform( {}, props, ( x, key ) => {
+        if( !Object.hasOwnProperty( key ) ) return x;
+    } ));
+}
+
 /** Similar to underscore `_.omit` */
 export function omit( source : {}, ...rest : string[] ) : {}
 export function omit( source ) : {} {
