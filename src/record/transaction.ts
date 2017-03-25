@@ -354,7 +354,17 @@ export class Record extends Transactional implements Owner {
         // It should substantially improve loading time for collections.
         // Or
         // Think of creating the multimode constructor packing all the stuff inside. Measure the gain.
+        // Add unknown arguments check as well for the debug mode.
+        // Implement real debug mode with NODE_ENV.
         /*
+        function check( attrs, _attributes ){
+            for( var key in attrs ){
+                if( !_attributes[ key ] ) ){
+                    
+                }
+            }
+        }
+
         function Attributes( values, record, options ){
             var clone = options.clone,
                 _attributes = record._attributes,
