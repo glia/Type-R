@@ -27,7 +27,7 @@ export interface AttributesSpec {
 }
 
 export type ForEach   = ( obj : {}, iteratee : ( val : any, key? : string, spec? : Attribute ) => void ) => void;
-export type Defaults  = ( attrs? : {} ) => {}
+export type Defaults  = ( attrs? : {}, options? ) => {}
 export type Parse     = ( data : any ) => any;
 export type ToJSON    = () => any;
 
@@ -118,6 +118,19 @@ export function createForEach( attrSpecs : AttributesSpec ) : ForEach {
     return <ForEach> new Function( 'a', 'f', statements.join( '' ) );
 }
 
+export function createInitialize( attrSpecs : AttributesSpec ) {
+    let statements = [ 'var _a, _attributes = this._attributes;' ];
+
+    for( let key in attrSpecs ){
+        statements.push( `_a = _attributes.${ key };` );
+        statements.push( `_a.handleChange( attributes.${ key } = _a.transform( attributes.${ key }, options, void 0, record ), void 0, record );` );
+    }
+
+    statements.push( `this.attributes = this._previousAttributes = attributes`);
+
+    return new Function( 'attributes', 'options', statements.join( '' ) );
+}
+
 /** @private */
 export function createCloneCtor( attrSpecs : AttributesSpec ) : CloneAttributesCtor {
     var statements = [];
@@ -134,11 +147,11 @@ export function createCloneCtor( attrSpecs : AttributesSpec ) : CloneAttributesC
 // Create optimized model.defaults( attrs, options ) function
 /** @private */
 function createDefaults( attrSpecs : AttributesSpec ) : Defaults {
-    let assign_f = ['var v;'], create_f = [];
+    const init = [], clone = [];
 
     function appendExpr( name, expr ){
-        assign_f.push( `this.${name} = ( v = a.${name} ) === void 0 ? ${expr} : v;` );
-        create_f.push( `this.${name} = ${expr};` );
+        clone.push( `this.${name} = i.clone( a.${name} );` );
+        init.push( `this.${name} = ( v = a.${name} ) === void 0 ? ${ expr } : v;` );
     }
 
     // Compile optimized constructor function for efficient deep copy of JSON literals in defaults.
@@ -167,15 +180,14 @@ function createDefaults( attrSpecs : AttributesSpec ) : Defaults {
         }
     }
 
-    const CreateDefaults : any = new Function( 'i', create_f.join( '' ) ),
-          AssignDefaults : any = new Function( 'a', 'i', assign_f.join( '' ) );
+    const DefaultAttributes : any = new Function( 'a', 'i', 'c', `if( c ){ ${ clone.join('') } }else{ var v; ${ init.join('') } }` );
 
-    CreateDefaults.prototype = AssignDefaults.prototype = Object.prototype;
+    DefaultAttributes.prototype = Object.prototype;
 
     // Create model.defaults( attrs, options ) function
     // 'attrs' will override default values, options will be passed to nested backbone types
-    return function( attrs? : {} ){ //TODO: Consider removing of the CreateDefaults. Currently is not used. May be used in Record costructor, though.
-        return attrs ? new AssignDefaults( attrs, this._attributes ) : new CreateDefaults( this._attributes );
+    return function( attrs  = {}, options ){
+        return new DefaultAttributes( attrs, this._attributes, options && options.clone );
     }
 }
 

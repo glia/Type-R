@@ -342,48 +342,7 @@ export class Record extends Transactional implements Owner {
         const options = a_options || {},
               values = ( options.parse ? this.parse( a_values, options ) :  a_values ) || {};
 
-        // TODO: type error for wrong object.
-
-        // TODO: We may use the same AssignDefaults constructor with transform function for cloning Attributes,
-        // passing an empty object and different transform function. options.clone check will be moved inside of the loop.
-        // So, we need the constructor with the "defaults" logic calling the transformation function.
-        const attributes = options.clone ? cloneAttributes( this, values ) : this.defaults( values ); 
-
-        // TODO: Here we have the loop for all attributes.
-        // There's the safe way to make it way faster by moving this transformation to the unrolled loop we have in 'defaults'.
-        // It should substantially improve loading time for collections.
-        // Or
-        // Think of creating the multimode constructor packing all the stuff inside. Measure the gain.
-        // Add unknown arguments check as well for the debug mode.
-        // Implement real debug mode with NODE_ENV.
-        /*
-        function check( attrs, _attributes ){
-            for( var key in attrs ){
-                if( !_attributes[ key ] ) ){
-                    
-                }
-            }
-        }
-
-        function Attributes( values, record, options ){
-            var clone = options.clone,
-                _attributes = record._attributes,
-                _a, v;
-
-            _a = _attributes.${ key };
-            v = values.${ key };
-            if( clone ) v = _a.clone( v ) else if( v === void 0 ) v = ${ expr };
-            v = this.${ key } = _a.transform( v, options, void 0, record );
-            _a.handleChange( v, void 0, record );
-            ...
-        }
-        */
-        this.forEachAttr( attributes, ( value : any, key : string, attr : AttributeUpdatePipeline ) => {
-            const next = attributes[ key ] = attr.transform( value, options, void 0, this );
-                  attr.handleChange( next, void 0, this );
-        });
-
-        this.attributes = this._previousAttributes = attributes;
+        this._initialize( this.defaults( values, options ), options );
 
         this.initialize( a_values, a_options );
 
