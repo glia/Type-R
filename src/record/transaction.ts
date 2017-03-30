@@ -251,6 +251,9 @@ export class Record extends Transactional implements Owner {
     // Attributes object copy constructor
     // Attributes : CloneAttributesCtor
     Attributes( x : AttributesValues ) : void { this.id = x.id; }
+    DefaultAttributes( _attributes : AttributesSpec, attrs : any, clone : boolean ) : void {
+        this.id = attrs.id;
+    }
 
     // forEach function for traversing through attributes, with protective default implementation
     // Overriden by dynamically compiled loop unrolled function in define.ts
@@ -347,6 +350,11 @@ export class Record extends Transactional implements Owner {
         this.initialize( a_values, a_options );
 
         if( this._localEvents ) this._localEvents.subscribe( this, this );
+    }
+
+    // 
+    _initialize( attrs, options ){
+        
     }
 
     // Initialization callback, to be overriden by the subclasses 

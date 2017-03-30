@@ -1,5 +1,6 @@
 import { tools, eventsApi, EventMap } from '../object-plus'
 import { AnyType } from './attributes'
+import { CompiledReference } from '../traversable'
 
 export interface Attributes {
     [ key : string ] : AnyType
@@ -53,15 +54,18 @@ const MetaMixin : MetaMixin = {
         return Constructor;
     },
 
-    forEachAttr : _attributes => !tools.log.level &&
-        new Function( 'a', 'f',`
-            var v,
-                _a = this._attributes;
+    forEachAttr( _attributes ){
+        if( !tools.log.level ){
+            return new Function( 'a', 'f',`
+                var v,
+                    _a = this._attributes;
 
-            ${ unroll( _attributes, name => `
-                ( v = a.${name} ) === void 0 || f( v, "${name}", _a.${name} );
-            `)}
-        `),
+                ${ unroll( _attributes, name => `
+                    ( v = a.${name} ) === void 0 || f( v, "${name}", _a.${name} );
+                `)}
+            `)
+        }
+    },
 
     _initialize : _attributes => 
         new Function( 'attributes', 'options',`
@@ -159,7 +163,7 @@ function hasParse( _attributes : Attributes ){
     return false;
 }
 
-function unroll< T >( _attributes : { [ key : string ] : T }, fun : ( key : string, attr : T ) => string ) : string {
+function unroll< T >( _attributes : { [ key : string ] : T }, fun : ( key : string, attr : T ) => string, separator = '' ) : string {
     const body = [];
     
     for( let key in _attributes ){
@@ -167,5 +171,5 @@ function unroll< T >( _attributes : { [ key : string ] : T }, fun : ( key : stri
         line && body.push( line );
     }
 
-    return body.join( '' );
+    return body.join( separator );
 }
