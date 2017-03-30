@@ -342,7 +342,7 @@ export class Record extends Transactional implements Owner {
         const options = a_options || {},
               values = ( options.parse ? this.parse( a_values, options ) :  a_values ) || {};
 
-        this._initialize( this.defaults( values, options ), options );
+        this._initialize( new this.DefaultAttributes( this._attributes, values, options.clone ), options );
 
         this.initialize( a_values, a_options );
 
