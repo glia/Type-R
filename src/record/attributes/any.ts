@@ -53,6 +53,9 @@ export class AnyType implements AttributeUpdatePipeline {
 
         return new AttributeCtor( name, options );
     }
+
+    resetIdReferences( record : AttributesContainer ){}
+
     /**
      * Update pipeline functions
      * =========================

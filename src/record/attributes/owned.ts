@@ -9,6 +9,11 @@ const { free, aquire } = transactionApi;
 export class AggregatedType extends AnyType {
     type : typeof Transactional
 
+    resetIdReferences( record : AttributesContainer ){
+        // Recursively traverse aggregation tree
+        record[ this.name ].resetIdReferences();
+    }
+
     clone( value : Transactional ) : Transactional {
         return value ? value.clone() : value;
     }

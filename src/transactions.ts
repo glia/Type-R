@@ -56,6 +56,8 @@ export abstract class Transactional implements Messenger, Validatable, Traversab
     
     _disposed : boolean;
 
+    abstract resetIdReferences();
+
     // State accessor. 
     readonly __inner_state__ : any;
 

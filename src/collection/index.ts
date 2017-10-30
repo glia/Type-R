@@ -351,6 +351,12 @@ export class Collection< R extends Record = Record> extends Transactional implem
         super.dispose();
     }
 
+    resetIdReferences(){
+        if( !this._shared ){
+            this.each( record => record.resetIdReferences() );
+        }
+    }
+
     reset( a_elements? : ElementsArg, options : TransactionOptions = {} ) : R[] {
         const isRoot = begin( this ),
               previousModels = dispose( this );

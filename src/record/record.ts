@@ -272,6 +272,12 @@ export class Record extends Transactional implements AttributesContainer {
         return defaults;
     }
 
+    resetIdReferences() : void {
+        for( let attribute of this._attributesArray ){
+            attribute.resetIdReferences( this );
+        }
+    }
+
     /***************************************************
      * Record construction
      */

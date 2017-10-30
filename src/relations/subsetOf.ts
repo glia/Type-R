@@ -40,6 +40,14 @@ function defineSubsetCollection( CollectionConstructor : typeof Collection ) {
             this.refs = toArray( recordsOrIds );
         }
 
+        resetIdReferences( record : Record ){
+            if( this.resolvedWith ){
+                this.refs = this.map( x => x.id );
+                this.reset( [], { silent : true } );
+                this.resolvedWith = null;              
+            }
+        }            
+
         // Remove should work fine as it already accepts ids. Add won't...
         add( a_elements, options? ){
             const { resolvedWith } = this,

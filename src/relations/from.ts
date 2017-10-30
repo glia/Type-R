@@ -24,7 +24,16 @@ class RecordRefType extends AnyType {
         return value && typeof value === 'object' ? value.id : value;
     }
 
-    // Wne 
+    resetIdReferences( record : Record ){
+        const { name } = this,
+            value = record.attributes[ name ];
+
+        if( value && typeof value === 'object' ){
+            record.attributes[ name ] = value.id;
+            this.handleChange( null, value, record, {} );
+        }
+    }
+
     clone( value : RecordRefValue ){
         return value && typeof value === 'object' ? value.id : value;
     }
