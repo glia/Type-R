@@ -2113,6 +2113,350 @@ var IORecordMixin = {
     }
 };
 
+var ArrayProto$1 = Array.prototype;
+var ObjectProto$1 = Object.prototype;
+function helpers(value) {
+    if (value && typeof value === 'object') {
+        switch (Object.getPrototypeOf(value)) {
+            case ArrayProto$1: return arrayHelpers;
+            case ObjectProto$1: return objectHelpers;
+        }
+    }
+    return dummyHelpers;
+}
+var dummyHelpers = {
+    clone: function (value) { return value; },
+    map: function (link, fun) { return []; },
+    remove: function (value) { return value; }
+};
+var objectHelpers = {
+    map: function (link, iterator) {
+        var mapped = [];
+        for (var key in link.value) {
+            var element = iterator(link.at(key), key);
+            element === void 0 || (mapped.push(element));
+        }
+        return mapped;
+    },
+    remove: function (object, key) {
+        delete object[key];
+        return object;
+    },
+    clone: function (object) {
+        var cloned = {};
+        for (var key in object) {
+            cloned[key] = object[key];
+        }
+        return cloned;
+    }
+};
+var arrayHelpers = {
+    clone: function (array) {
+        return array.slice();
+    },
+    remove: function (array, i) {
+        array.splice(i, 1);
+        return array;
+    },
+    map: function (link, iterator) {
+        var length = link.value.length, mapped = Array(length);
+        for (var i = 0, j = 0; i < length; i++) {
+            var y = iterator(link.at(i), i);
+            y === void 0 || (mapped[j++] = y);
+        }
+        mapped.length === j || (mapped.length = j);
+        return mapped;
+    }
+};
+
+var Link = (function () {
+    function Link(value) {
+        this.value = value;
+    }
+    Link.value = function (value, set) {
+        return new CustomLink(value, set);
+    };
+    Object.defineProperty(Link.prototype, "validationError", {
+        get: function () { return this.error; },
+        enumerable: true,
+        configurable: true
+    });
+    Link.prototype.onChange = function (handler) {
+        var _this = this;
+        return new CloneLink(this, function (x) {
+            handler(x);
+            _this.set(x);
+        });
+    };
+    Object.defineProperty(Link.prototype, "props", {
+        get: function () {
+            var _this = this;
+            return typeof this.value === 'boolean' ? {
+                checked: this.value,
+                onChange: function (e) { return _this.set(Boolean(e.target.checked)); }
+            } : {
+                value: this.value,
+                onChange: function (e) { return _this.set(e.target.value); }
+            };
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Link.prototype.requestChange = function (x) {
+        this.set(x);
+    };
+    Link.prototype.update = function (transform, e) {
+        var next = transform(this.clone(), e);
+        next === void 0 || this.set(next);
+    };
+    Link.prototype.pipe = function (handler) {
+        var _this = this;
+        return new CloneLink(this, function (x) {
+            var next = handler(x, _this.value);
+            next === void 0 || _this.set(next);
+        });
+    };
+    Link.prototype.action = function (transform) {
+        var _this = this;
+        return function (e) { return _this.update(transform, e); };
+    };
+    Link.prototype.equals = function (truthyValue) {
+        return new EqualsLink(this, truthyValue);
+    };
+    Link.prototype.enabled = function (defaultValue) {
+        return new EnabledLink(this, defaultValue || "");
+    };
+    Link.prototype.contains = function (element) {
+        return new ContainsLink(this, element);
+    };
+    Link.prototype.push = function () {
+        var array = arrayHelpers.clone(this.value);
+        Array.prototype.push.apply(array, arguments);
+        this.set(array);
+    };
+    Link.prototype.unshift = function () {
+        var array = arrayHelpers.clone(this.value);
+        Array.prototype.unshift.apply(array, arguments);
+        this.set(array);
+    };
+    Link.prototype.splice = function () {
+        var array = arrayHelpers.clone(this.value);
+        Array.prototype.splice.apply(array, arguments);
+        this.set(array);
+    };
+    Link.prototype.map = function (iterator) {
+        return helpers(this.value).map(this, iterator);
+    };
+    Link.prototype.removeAt = function (key) {
+        var value = this.value, _ = helpers(value);
+        this.set(_.remove(_.clone(value), key));
+    };
+    Link.prototype.at = function (key) {
+        return new LinkAt(this, key);
+    };
+    Link.prototype.clone = function () {
+        var value = this.value;
+        return helpers(value).clone(value);
+    };
+    Link.prototype.pick = function () {
+        var links = {};
+        for (var i = 0; i < arguments.length; i++) {
+            var key = arguments[i];
+            links[key] = new LinkAt(this, key);
+        }
+        return links;
+    };
+    Link.prototype.check = function (whenValid, error) {
+        if (!this.error && !whenValid(this.value)) {
+            this.error = error || whenValid.error || defaultError;
+        }
+        return this;
+    };
+    return Link;
+}());
+var CustomLink = (function (_super) {
+    __extends(CustomLink, _super);
+    function CustomLink(value, set) {
+        var _this = _super.call(this, value) || this;
+        _this.set = set;
+        return _this;
+    }
+    CustomLink.prototype.set = function (x) { };
+    return CustomLink;
+}(Link));
+var CloneLink = (function (_super) {
+    __extends(CloneLink, _super);
+    function CloneLink(parent, set) {
+        var _this = _super.call(this, parent.value) || this;
+        _this.set = set;
+        var error = parent.error;
+        if (error)
+            _this.error = error;
+        return _this;
+    }
+    CloneLink.prototype.set = function (x) { };
+    return CloneLink;
+}(Link));
+var EqualsLink = (function (_super) {
+    __extends(EqualsLink, _super);
+    function EqualsLink(parent, truthyValue) {
+        var _this = _super.call(this, parent.value === truthyValue) || this;
+        _this.parent = parent;
+        _this.truthyValue = truthyValue;
+        return _this;
+    }
+    EqualsLink.prototype.set = function (x) {
+        this.parent.set(x ? this.truthyValue : null);
+    };
+    return EqualsLink;
+}(Link));
+var EnabledLink = (function (_super) {
+    __extends(EnabledLink, _super);
+    function EnabledLink(parent, defaultValue) {
+        var _this = _super.call(this, parent.value != null) || this;
+        _this.parent = parent;
+        _this.defaultValue = defaultValue;
+        return _this;
+    }
+    EnabledLink.prototype.set = function (x) {
+        this.parent.set(x ? this.defaultValue : null);
+    };
+    return EnabledLink;
+}(Link));
+var ContainsLink = (function (_super) {
+    __extends(ContainsLink, _super);
+    function ContainsLink(parent, element) {
+        var _this = _super.call(this, parent.value.indexOf(element) >= 0) || this;
+        _this.parent = parent;
+        _this.element = element;
+        return _this;
+    }
+    ContainsLink.prototype.set = function (x) {
+        var _this = this;
+        var next = Boolean(x);
+        if (this.value !== next) {
+            var arr = this.parent.value, nextValue = x ? arr.concat(this.element) : arr.filter(function (el) { return el !== _this.element; });
+            this.parent.set(nextValue);
+        }
+    };
+    return ContainsLink;
+}(Link));
+var defaultError = 'Invalid value';
+var LinkAt = (function (_super) {
+    __extends(LinkAt, _super);
+    function LinkAt(parent, key) {
+        var _this = _super.call(this, parent.value[key]) || this;
+        _this.parent = parent;
+        _this.key = key;
+        return _this;
+    }
+    LinkAt.prototype.remove = function () {
+        this.parent.removeAt(this.key);
+    };
+    LinkAt.prototype.set = function (x) {
+        var _this = this;
+        if (this.value !== x) {
+            this.parent.update(function (value) {
+                value[_this.key] = x;
+                return value;
+            });
+        }
+    };
+    
+    return LinkAt;
+}(Link));
+
+var RecordLinksMixin = {
+    linkAt: function (key) {
+        return cacheLink(getLinksCache(this), this, key);
+    },
+    linkPath: function (path, options) {
+        return new RecordDeepLink(this, path, options);
+    },
+    linkAll: function () {
+        var links = getLinksCache(this);
+        if (arguments.length) {
+            for (var i = 0; i < arguments.length; i++) {
+                cacheLink(links, this, arguments[i]);
+            }
+        }
+        else {
+            var attributes = this.attributes;
+            for (var key in attributes) {
+                attributes[key] === void 0 || cacheLink(links, this, key);
+            }
+        }
+        return links;
+    }
+};
+function getLinksCache(record) {
+    return record._links || (record._links = new record.AttributesCopy({}));
+}
+function cacheLink(links, record, key) {
+    var cached = links[key], value = record[key];
+    return cached && cached.value === value ? cached
+        : links[key] = new RecordLink(record, key, value);
+}
+var RecordLink = (function (_super) {
+    __extends(RecordLink, _super);
+    function RecordLink(record, attr, value) {
+        var _this = _super.call(this, value) || this;
+        _this.record = record;
+        _this.attr = attr;
+        return _this;
+    }
+    RecordLink.prototype.set = function (x) {
+        this.record[this.attr] = x;
+    };
+    Object.defineProperty(RecordLink.prototype, "error", {
+        get: function () {
+            return this._error === void 0 ?
+                this.record.getValidationError(this.attr) :
+                this._error;
+        },
+        set: function (x) {
+            this._error = x;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return RecordLink;
+}(Link));
+var RecordDeepLink = (function (_super) {
+    __extends(RecordDeepLink, _super);
+    function RecordDeepLink(record, path, options) {
+        var _this = _super.call(this, record.deepGet(path)) || this;
+        _this.record = record;
+        _this.path = path;
+        _this.options = options;
+        return _this;
+    }
+    Object.defineProperty(RecordDeepLink.prototype, "error", {
+        get: function () {
+            if (this._error === void 0) {
+                this._error = this.record.deepValidationError(this.path) || null;
+            }
+            return this._error;
+        },
+        set: function (x) {
+            this._error = x;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(RecordDeepLink.prototype, "_changeToken", {
+        get: function () {
+            return this.record._changeToken;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    RecordDeepLink.prototype.set = function (x) {
+        this.record.deepSet(this.path, x, this.options);
+    };
+    return RecordDeepLink;
+}(Link));
+
 var assign$4 = assign;
 var isEmpty$1 = isEmpty;
 var log$2 = log;
@@ -2121,6 +2465,7 @@ var Record = (function (_super) {
     __extends(Record, _super);
     function Record(a_values, a_options) {
         var _this = _super.call(this, _cidCounter++) || this;
+        _this._links = void 0;
         _this.attributes = {};
         var options = a_options || {}, values = (options.parse ? _this.parse(a_values, options) : a_values) || {};
         if (log$2.level > 1)
@@ -2369,7 +2714,7 @@ var Record = (function (_super) {
             _changeEventName: 'change',
             idAttribute: 'id'
         }),
-        mixins(IORecordMixin),
+        mixins(IORecordMixin, RecordLinksMixin),
         definitions({
             defaults: mixinRules.merge,
             attributes: mixinRules.merge,

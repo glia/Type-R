@@ -17,6 +17,8 @@ import { AnyType, AggregatedType, setAttribute, UpdateRecordMixin,
 import { IORecord, IORecordMixin } from './io-mixin'
 import { IOPromise, IOEndpoint } from '../io-tools'
 
+import { LinkedRecord, RecordLink, RecordLinksMixin, LinksCache } from './links'
+
 const { assign, isEmpty, log } = tools;
 
 /*******************************************************
@@ -50,7 +52,7 @@ export interface RecordDefinition extends TransactionalDefinition {
     // Default id attribute name
     idAttribute : 'id'
 })
-@mixins( IORecordMixin )
+@mixins( IORecordMixin, RecordLinksMixin )
 @definitions({
     defaults : mixinRules.merge,
     attributes : mixinRules.merge,
@@ -58,7 +60,7 @@ export interface RecordDefinition extends TransactionalDefinition {
     Collection : mixinRules.value,
     idAttribute : mixinRules.protoValue
 })
-export class Record extends Transactional implements IORecord, AttributesContainer {
+export class Record extends Transactional implements IORecord, LinkedRecord, AttributesContainer {
     // Hack
     static onDefine( definition, BaseClass ){}
 
@@ -72,6 +74,15 @@ export class Record extends Transactional implements IORecord, AttributesContain
     }
     
     static attributes : AttributesValues
+
+    /**
+     * Links methods
+     */
+    _links :  LinksCache = void 0;
+
+    linkAt : ( key : string ) => RecordLink
+    linkPath : ( key : string, options? : object ) => RecordLink
+    linkAll : ( ...keys : string [] ) => LinksCache
 
     /********************
      * IO Methods
