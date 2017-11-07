@@ -3288,6 +3288,13 @@ var Collection = (function (_super) {
     Collection.prototype.getStore = function () {
         return this._store || (this._store = this._owner ? this._owner.getStore() : this._defaultStore);
     };
+    Collection.prototype.linkContains = function (record) {
+        return new CollectionLink(this, record);
+    };
+    Collection.prototype.linkAt = function (prop$$1) {
+        var _this = this;
+        return Link.value(this[prop$$1], function (x) { return _this[prop$$1] = x; });
+    };
     Collection.prototype._onChildrenChange = function (record, options, initiator) {
         if (options === void 0) { options = {}; }
         if (initiator === this)
@@ -3593,6 +3600,19 @@ function toPredicateFunction(iteratee, context) {
     }
     return bindContext(iteratee, context);
 }
+var CollectionLink = (function (_super) {
+    __extends(CollectionLink, _super);
+    function CollectionLink(collection, record) {
+        var _this = _super.call(this, Boolean(collection._byId[record.cid])) || this;
+        _this.collection = collection;
+        _this.record = record;
+        return _this;
+    }
+    CollectionLink.prototype.set = function (x) {
+        this.collection.toggle(this.record, x);
+    };
+    return CollectionLink;
+}(Link));
 
 function parseReference(collectionRef) {
     switch (typeof collectionRef) {

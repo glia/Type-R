@@ -7,6 +7,7 @@ import { addTransaction, AddOptions } from './add'
 import { setTransaction, emptySetTransaction } from './set'
 import { removeOne, removeMany } from './remove'
 import { IOPromise, startIO } from '../io-tools'
+import { Link } from '../link'
 
 const { trigger2, on, off } = eventsApi,
     { begin, commit, markAsDirty } = transactionApi,
@@ -146,6 +147,16 @@ export class Collection< R extends Record = Record> extends Transactional implem
     }
 
     _store : Transactional
+
+    // Boolean link to the record's presence in the collection
+    linkContains( record : Record ) : CollectionLink {
+        return new CollectionLink( this, record );
+    }
+
+    // Link to collection's property
+    linkAt( prop : string ) : Link<any> {
+        return Link.value( this[ prop ], x => this[ prop ] = x );
+    }
 
     get comparator(){ return this._comparator; }
     _comparator : ( a : R, b : R ) => number
@@ -595,5 +606,14 @@ function toPredicateFunction<R>( iteratee : Predicate<R>, context : any ){
     }
     
     return bindContext( iteratee, context );
+}
 
+export class CollectionLink extends Link< boolean >{
+    constructor( public collection, public record ){
+        super( Boolean( collection._byId[ record.cid ] ) );
+    }
+
+    set( x ){
+        this.collection.toggle( this.record, x );
+    }
 }

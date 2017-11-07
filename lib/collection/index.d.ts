@@ -4,6 +4,7 @@ import { Record, AggregatedType } from '../record';
 import { CollectionCore, CollectionTransaction } from './commons';
 import { AddOptions } from './add';
 import { IOPromise } from '../io-tools';
+import { Link } from '../link';
 export declare type GenericComparator = string | ((x: Record) => number) | ((a: Record, b: Record) => number);
 export interface CollectionOptions extends TransactionOptions {
     comparator?: GenericComparator;
@@ -34,6 +35,8 @@ export declare class Collection<R extends Record = Record> extends Transactional
     comparator: GenericComparator;
     getStore(): Transactional;
     _store: Transactional;
+    linkContains(record: Record): CollectionLink;
+    linkAt(prop: string): Link<any>;
     _comparator: (a: R, b: R) => number;
     _onChildrenChange(record: R, options?: TransactionOptions, initiator?: Transactional): void;
     get(objOrId: string | R | Object): R;
@@ -82,3 +85,9 @@ export declare class Collection<R extends Record = Record> extends Transactional
 }
 export declare type LiveUpdatesOption = boolean | ((x: any) => boolean);
 export declare type ElementsArg = Object | Record | Object[] | Record[];
+export declare class CollectionLink extends Link<boolean> {
+    collection: any;
+    record: any;
+    constructor(collection: any, record: any);
+    set(x: any): void;
+}
