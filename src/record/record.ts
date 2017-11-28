@@ -347,7 +347,7 @@ export class Record extends Transactional implements IORecord, AttributesContain
      */
 
     // Default record-level serializer, to be overriden by subclasses 
-    toJSON() : Object {
+    toJSON() : any {
         const json = {};
 
         this.forEachAttr( this.attributes, ( value, key : string, { toJSON } ) =>{

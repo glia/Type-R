@@ -5,7 +5,22 @@ export interface AttributeCheck {
     (value: any, key: string): boolean;
     error?: any;
 }
-export declare class ChainableAttributeSpec {
+export interface AttributeDescriptor {
+    options: AttributeOptions;
+    check(check: AttributeCheck, error: any): AttributeDescriptor;
+    isRequired: AttributeDescriptor;
+    endpoint(endpoint: IOEndpoint): AttributeDescriptor;
+    watcher(ref: string | ((value: any, key: string) => void)): AttributeDescriptor;
+    parse(fun: Parse): AttributeDescriptor;
+    toJSON(fun: any): AttributeDescriptor;
+    get(fun: any): AttributeDescriptor;
+    set(fun: any): AttributeDescriptor;
+    changeEvents(events: boolean): AttributeDescriptor;
+    events(map: EventsDefinition): AttributeDescriptor;
+    value(x: any): AttributeDescriptor;
+    metadata(options: object): AttributeDescriptor;
+}
+export declare class ChainableAttributeSpec implements AttributeDescriptor {
     options: AttributeOptions;
     constructor(options: AttributeOptions);
     check(check: AttributeCheck, error: any): ChainableAttributeSpec;
@@ -32,3 +47,6 @@ declare global  {
     }
 }
 export declare function toAttributeOptions(spec: any): AttributeOptions;
+export interface UniversalTypeSpec extends PropertyDecorator, AttributeDescriptor {
+}
+export declare function type(Ctor: Function): UniversalTypeSpec;

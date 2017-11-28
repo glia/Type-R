@@ -15,7 +15,23 @@ export interface AttributeCheck {
     error? : any
 }
 
-export class ChainableAttributeSpec {
+export interface AttributeDescriptor {
+    options : AttributeOptions;
+    check( check : AttributeCheck, error : any ) : AttributeDescriptor
+    isRequired : AttributeDescriptor
+    endpoint( endpoint : IOEndpoint ) : AttributeDescriptor
+    watcher( ref : string | ( ( value : any, key : string ) => void ) ) : AttributeDescriptor
+    parse( fun : Parse ) : AttributeDescriptor
+    toJSON( fun ) : AttributeDescriptor
+    get( fun ) : AttributeDescriptor
+    set( fun ) : AttributeDescriptor
+    changeEvents( events : boolean ) : AttributeDescriptor
+    events( map : EventsDefinition ) : AttributeDescriptor
+    value( x : any ) : AttributeDescriptor
+    metadata( options : object ) : AttributeDescriptor
+}
+
+export class ChainableAttributeSpec implements AttributeDescriptor {
     options : AttributeOptions;
 
     constructor( options : AttributeOptions ) {
@@ -51,7 +67,7 @@ export class ChainableAttributeSpec {
         return this.metadata({ isRequired : true }); 
     }
 
-    endpoint( endpoint : IOEndpoint ){
+    endpoint( endpoint : IOEndpoint ) : ChainableAttributeSpec {
         return this.metadata({ endpoint });
     }
 
@@ -204,4 +220,16 @@ function inferType( value : {} ) : Function {
         case 'object' :
             return value ? <any> value.constructor : void 0;
     }
+}
+
+export interface UniversalTypeSpec extends PropertyDecorator, AttributeDescriptor {
+}
+
+function attributeDecorator( proto : object, name : string ) : void {
+
+}
+
+export function type( Ctor : Function ) : UniversalTypeSpec {
+    const options = { type : Ctor },
+          descriptor = attributeDecorator.bind( options );
 }

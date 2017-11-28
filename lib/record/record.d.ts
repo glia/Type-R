@@ -61,7 +61,7 @@ export declare class Record extends Transactional implements IORecord, Attribute
     deepClone(): this;
     _validateNested(errors: ChildrenErrors): number;
     get(key: string): any;
-    toJSON(): Object;
+    toJSON(): any;
     parse(data: any, options?: TransactionOptions): any;
     deepSet(name: string, value: any, options?: any): this;
     readonly collection: any;

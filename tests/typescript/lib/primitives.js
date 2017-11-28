@@ -1,6 +1,6 @@
 import * as tslib_1 from "tslib";
 import "reflect-metadata";
-import { predefine, define, attr, Record, Collection } from 'type-r';
+import { predefine, define, type, attr, Record, Collection } from 'type-r';
 import { expect } from 'chai';
 describe('Record', function () {
     it("can be instantiated", function () {
@@ -326,6 +326,25 @@ describe('Record', function () {
             var t2 = t.clone();
             console.log('!!!', t._attributes);
             expect(t.fun).to.eql(t2.fun);
+        });
+        it('Supports @type( Ctor ) decorator', function () {
+            var Test = (function (_super) {
+                tslib_1.__extends(Test, _super);
+                function Test() {
+                    return _super !== null && _super.apply(this, arguments) || this;
+                }
+                tslib_1.__decorate([
+                    type(String).value("x").toJSON(function (x) { return 1; }),
+                    tslib_1.__metadata("design:type", String)
+                ], Test.prototype, "x", void 0);
+                Test = tslib_1.__decorate([
+                    define
+                ], Test);
+                return Test;
+            }(Record));
+            var t = new Test();
+            expect(t.x).to.eql('x');
+            expect(t.toJSON().x).to.eql(1);
         });
     });
     describe('Record pre-definition', function () {

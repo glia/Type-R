@@ -1,5 +1,5 @@
 import "reflect-metadata"
-import { predefine, define, attr, prop, Record, Store, Collection } from 'type-r'
+import { predefine, define, type, attr, prop, Record, Store, Collection } from 'type-r'
 import { expect } from 'chai'
 
 describe( 'Record', () =>{
@@ -258,6 +258,17 @@ describe( 'Record', () =>{
             console.log( '!!!', t._attributes );
             expect( t.fun ).to.eql( t2.fun );
         } );
+
+        it( 'Supports @type( Ctor ) decorator', () => {
+            @define class Test extends Record {
+                @type( String ).value( "x" ).toJSON( x => 1 )
+                x : string;
+            }
+
+            const t = new Test();
+            expect( t.x ).to.eql( 'x' );
+            expect( t.toJSON().x ).to.eql( 1 );
+        });
     });
 
     describe( 'Record pre-definition', ()=>{
