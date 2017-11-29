@@ -230,6 +230,14 @@ function attributeDecorator( proto : object, name : string ) : void {
 }
 
 export function type( Ctor : Function ) : UniversalTypeSpec {
-    const options = { type : Ctor },
-          descriptor = attributeDecorator.bind( options );
+    const 
+
+    descriptor.metadata = function( a_options = {} ){
+        const options = { ...this.options, ...a_options },
+              next = attributeDecorator.bind( options );
+
+        next.options = options;
+    }
+
+    
 }
