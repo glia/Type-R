@@ -1591,6 +1591,10 @@ var ChainableAttributeSpec = (function () {
             changeHandlers: this.options.changeHandlers.concat(handleEventsSubscribtion)
         });
     };
+    ChainableAttributeSpec.prototype.properties = function (props) {
+        this.metadata(props);
+        return this;
+    };
     Object.defineProperty(ChainableAttributeSpec.prototype, "has", {
         get: function () {
             return this;

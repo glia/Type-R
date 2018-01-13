@@ -28,6 +28,7 @@ export interface AttributeOptions {
 
     parse? : Parse
     toJSON? : AttributeToJSON
+    properties? : Object
    
     getHooks? : GetHook[]
     transforms? : Transform[]
@@ -108,6 +109,8 @@ export class AnyType implements AttributeUpdatePipeline {
         return value && value.toJSON ? value.toJSON() : value;
     }
 
+    properties: Object
+    
     createPropertyDescriptor() : PropertyDescriptor | void {
         const { name, getHook } = this;
 
@@ -194,7 +197,7 @@ export class AnyType implements AttributeUpdatePipeline {
         options.changeHandlers = options.changeHandlers.slice();
 
         const {
-                  value, type, parse, toJSON, changeEvents,
+                  value, type, parse, toJSON, changeEvents, properties,
                   validate, getHooks, transforms, changeHandlers
               } = options;
 
@@ -219,6 +222,8 @@ export class AnyType implements AttributeUpdatePipeline {
 
         this.toJSON = toJSON === void 0 ? this.toJSON : toJSON;
 
+        this.properties = properties == void 0 ? {} : properties;
+        
         this.validate = validate || this.validate;
         
         if( options.isRequired ){

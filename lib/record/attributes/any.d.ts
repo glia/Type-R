@@ -20,6 +20,7 @@ export interface AttributeOptions {
     hasCustomDefault?: boolean;
     parse?: Parse;
     toJSON?: AttributeToJSON;
+    properties?: Object;
     getHooks?: GetHook[];
     transforms?: Transform[];
     changeHandlers?: ChangeHandler[];
@@ -43,6 +44,7 @@ export declare class AnyType implements AttributeUpdatePipeline {
     dispose(record: AttributesContainer, value: any): void;
     validate(record: AttributesContainer, value: any, key: string): void;
     toJSON(value: any, key: any): any;
+    properties: Object;
     createPropertyDescriptor(): PropertyDescriptor | void;
     value: any;
     static defaultValue: any;

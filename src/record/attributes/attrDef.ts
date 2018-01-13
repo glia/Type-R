@@ -112,6 +112,13 @@ export class ChainableAttributeSpec {
         });
     }
 
+    // Subsribe to events from an attribute.
+    properties( props : object ) : ChainableAttributeSpec {
+
+        console.log('attrDef properties props', props);
+        return this.metadata({properties: props});
+    }
+
     // Creates a copy of the spec.
     get has() : ChainableAttributeSpec {
         return this;
