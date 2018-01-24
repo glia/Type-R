@@ -89,7 +89,10 @@ export class SharedType extends AnyType {
         if( next == null || next instanceof this.type ) return next;
 
         // Convert type using implicitly created rtransactional object.
-        const implicitObject = new ( this.type as any )( next, options, shareAndListen );
+        const implicitObject = this.type.create 
+                               ? this.type.create( next, options, shareAndListen )
+                               : new ( this.type as any )( next, options, shareAndListen );
+        //const implicitObject = new ( this.type as any )( next, options, shareAndListen );
 
         // To prevent a leak, we need to take an ownership on it.
         aquire( record, implicitObject, this.name );
