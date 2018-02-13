@@ -20,6 +20,7 @@ export declare class ChainableAttributeSpec {
     changeEvents(events: boolean): ChainableAttributeSpec;
     events(map: EventsDefinition): ChainableAttributeSpec;
     properties(props: object): ChainableAttributeSpec;
+    lazyRelations(value: boolean): ChainableAttributeSpec;
     readonly has: ChainableAttributeSpec;
     metadata(options: AttributeOptions): ChainableAttributeSpec;
     value(x: any): ChainableAttributeSpec;

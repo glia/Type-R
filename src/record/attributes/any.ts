@@ -29,6 +29,7 @@ export interface AttributeOptions {
     parse? : Parse
     toJSON? : AttributeToJSON
     properties? : Object
+    lazyRelations? : boolean
    
     getHooks? : GetHook[]
     transforms? : Transform[]
@@ -110,6 +111,8 @@ export class AnyType implements AttributeUpdatePipeline {
     }
 
     properties: Object
+    
+    lazyRelations: boolean
     
     createPropertyDescriptor() : PropertyDescriptor | void {
         const { name, getHook } = this;
@@ -197,7 +200,7 @@ export class AnyType implements AttributeUpdatePipeline {
         options.changeHandlers = options.changeHandlers.slice();
 
         const {
-                  value, type, parse, toJSON, changeEvents, properties,
+                  value, type, parse, toJSON, changeEvents, properties, lazyRelations,
                   validate, getHooks, transforms, changeHandlers
               } = options;
 
@@ -223,6 +226,8 @@ export class AnyType implements AttributeUpdatePipeline {
         this.toJSON = toJSON === void 0 ? this.toJSON : toJSON;
 
         this.properties = properties == void 0 ? {} : properties;
+        
+        this.lazyRelations = lazyRelations == void 0 ? true : lazyRelations;
         
         this.validate = validate || this.validate;
         

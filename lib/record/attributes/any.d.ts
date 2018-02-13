@@ -21,6 +21,7 @@ export interface AttributeOptions {
     parse?: Parse;
     toJSON?: AttributeToJSON;
     properties?: Object;
+    lazyRelations?: boolean;
     getHooks?: GetHook[];
     transforms?: Transform[];
     changeHandlers?: ChangeHandler[];
@@ -45,6 +46,7 @@ export declare class AnyType implements AttributeUpdatePipeline {
     validate(record: AttributesContainer, value: any, key: string): void;
     toJSON(value: any, key: any): any;
     properties: Object;
+    lazyRelations: boolean;
     createPropertyDescriptor(): PropertyDescriptor | void;
     value: any;
     static defaultValue: any;
