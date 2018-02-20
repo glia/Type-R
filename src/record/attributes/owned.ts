@@ -84,7 +84,9 @@ export class AggregatedType extends AnyType {
 
             // With explicit 'merge' option we need to clone an object if its previous value was 'null'.
             // This is an only case we could be here when merge === true.
-            return options.merge ? next.clone() : next;
+            // Removed clone, was causing duplication of models on single relations
+            return next;
+            //return options.merge ? next.clone() : next;
         }
 
         return <any>this.type.create( next, options );
