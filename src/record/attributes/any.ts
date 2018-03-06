@@ -227,7 +227,7 @@ export class AnyType implements AttributeUpdatePipeline {
 
         this.properties = properties == void 0 ? {} : properties;
         
-        this.lazyRelations = lazyRelations == void 0 ? true : lazyRelations;
+        this.lazyRelations = lazyRelations == void 0 ? this.lazyRelations : lazyRelations;
         
         this.validate = validate || this.validate;
         
