@@ -104,6 +104,7 @@ export interface TransactionOptions {
     validate?: boolean;
     ioUpdate?: boolean;
     upsert?: boolean;
+    lazyRelations?: boolean;
 }
 export declare const transactionApi: {
     begin(object: Transactional): boolean;

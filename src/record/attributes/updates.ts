@@ -133,7 +133,8 @@ export const UpdateRecordMixin = {
                 const spec = _attributes[ name ];
 
                 if( spec ){
-                    if( spec.doUpdate( values[ name ], this, options, nested ) ){
+                    // ADDED Do not automatically instantiate objects if lazy relations are set
+                    if( !options.lazyRelations && spec.doUpdate( values[ name ], this, options, nested ) ){
                         changes.push( name );
                     }
                 }
