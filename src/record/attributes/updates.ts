@@ -40,6 +40,7 @@ export interface AttributesDescriptors {
 
 export interface AttributeUpdatePipeline{
     doUpdate( value, record : AttributesContainer, options : TransactionOptions, nested? : Transaction[] ) : boolean
+    lazyRelations : boolean
 }
 
  // Optimized single attribute transactional update. To be called from attributes setters
@@ -134,7 +135,8 @@ export const UpdateRecordMixin = {
 
                 if( spec ){
                     // ADDED Do not automatically instantiate objects if lazy relations are set
-                    if( !options.lazyRelations && spec.doUpdate( values[ name ], this, options, nested ) ){
+                    if( !options.lazyRelations
+                        && spec.doUpdate( values[ name ], this, options, nested ) ){
                         changes.push( name );
                     }
                 }
