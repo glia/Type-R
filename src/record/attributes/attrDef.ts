@@ -115,13 +115,13 @@ export class ChainableAttributeSpec {
     // Attach arbitrary properties to the attribute ie. min, max
     properties( props : object ) : ChainableAttributeSpec {
 
-        console.log('attrDef properties props', props);
+        //console.log('attrDef properties props', props);
         return this.metadata({properties: props});
     }
 
     lazyRelations( value : boolean ) : ChainableAttributeSpec {
 
-        console.log('attrDef lazyRelations fields', value);
+        //console.log('attrDef lazyRelations fields', value);
         return this.metadata({lazyRelations: value});
     }
 

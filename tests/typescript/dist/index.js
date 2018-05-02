@@ -990,8 +990,8 @@ var Transactional = (function () {
             this.create = Transactional_1.create;
         }
     };
-    Transactional.create = function (a, b) {
-        return new this(a, b);
+    Transactional.create = function (a, b, c) {
+        return new this(a, b, c);
     };
     Transactional.prototype.dispose = function () {
         if (this._disposed)
@@ -1228,7 +1228,8 @@ var UpdateRecordMixin = {
             for (var name_1 in values) {
                 var spec = _attributes[name_1];
                 if (spec) {
-                    if (spec.doUpdate(values[name_1], this, options, nested)) {
+                    if (!options.lazyRelations
+                        && spec.doUpdate(values[name_1], this, options, nested)) {
                         changes.push(name_1);
                     }
                 }
@@ -1298,7 +1299,7 @@ var AnyType = (function () {
         options.getHooks = options.getHooks.slice();
         options.transforms = options.transforms.slice();
         options.changeHandlers = options.changeHandlers.slice();
-        var value = options.value, type = options.type, parse = options.parse, toJSON = options.toJSON, changeEvents = options.changeEvents, validate = options.validate, getHooks = options.getHooks, transforms = options.transforms, changeHandlers = options.changeHandlers;
+        var value = options.value, type = options.type, parse = options.parse, toJSON = options.toJSON, changeEvents = options.changeEvents, properties = options.properties, lazyRelations = options.lazyRelations, validate = options.validate, getHooks = options.getHooks, transforms = options.transforms, changeHandlers = options.changeHandlers;
         this.value = value;
         this.type = type;
         if (!options.hasCustomDefault && type) {
@@ -1312,6 +1313,8 @@ var AnyType = (function () {
         }
         this.propagateChanges = changeEvents !== false;
         this.toJSON = toJSON === void 0 ? this.toJSON : toJSON;
+        this.properties = properties == void 0 ? {} : properties;
+        this.lazyRelations = lazyRelations == void 0 ? this.lazyRelations : lazyRelations;
         this.validate = validate || this.validate;
         if (options.isRequired) {
             this.validate = wrapIsRequired(this.validate);
@@ -1480,7 +1483,7 @@ var AggregatedType = (function (_super) {
             if (next._shared && !(next._shared & ItemsBehavior.persistent)) {
                 this._log('error', 'aggregated collection attribute is assigned with shared collection', next, record);
             }
-            return options.merge ? next.clone() : next;
+            return next;
         }
         return this.type.create(next, options);
     };
@@ -1592,8 +1595,10 @@ var ChainableAttributeSpec = (function () {
         });
     };
     ChainableAttributeSpec.prototype.properties = function (props) {
-        this.metadata(props);
-        return this;
+        return this.metadata({ properties: props });
+    };
+    ChainableAttributeSpec.prototype.lazyRelations = function (value) {
+        return this.metadata({ lazyRelations: value });
     };
     Object.defineProperty(ChainableAttributeSpec.prototype, "has", {
         get: function () {
@@ -1979,7 +1984,9 @@ var SharedType = (function (_super) {
     SharedType.prototype.convert = function (next, prev, record, options) {
         if (next == null || next instanceof this.type)
             return next;
-        var implicitObject = new this.type(next, options, shareAndListen);
+        var implicitObject = this.type.create
+            ? this.type.create(next, options, shareAndListen)
+            : new this.type(next, options, shareAndListen);
         aquire$1(record, implicitObject, this.name);
         return implicitObject;
     };
@@ -2598,7 +2605,6 @@ var CollectionTransaction = (function () {
     return CollectionTransaction;
 }());
 function logAggregationError(collection) {
-    collection._log('error', 'added records already have an owner', collection._aggregationError);
     collection._aggregationError = void 0;
 }
 
