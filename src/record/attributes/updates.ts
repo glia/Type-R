@@ -40,6 +40,8 @@ export interface AttributesDescriptors {
 
 export interface AttributeUpdatePipeline{
     doUpdate( value, record : AttributesContainer, options : TransactionOptions, nested? : Transaction[] ) : boolean
+    // ADDED
+    type : any
     lazyRelations : boolean
 }
 
@@ -134,9 +136,15 @@ export const UpdateRecordMixin = {
                 const spec = _attributes[ name ];
 
                 if( spec ){
-                    // ADDED Do not automatically instantiate objects if lazy relations are set
-                    if( !options.lazyRelations
-                        && spec.doUpdate( values[ name ], this, options, nested ) ){
+
+                    // ADDED Do not automatically instantiate model and collection relations if lazy relations are set
+                    if( options.lazyRelations
+                        && spec.type
+                        && (spec.type.isTypestreamModel || spec.type.isTypestreamCollection))
+                        continue;
+
+                    //if( !options.lazyRelations
+                    if ( spec.doUpdate( values[ name ], this, options, nested ) ){
                         changes.push( name );
                     }
                 }
