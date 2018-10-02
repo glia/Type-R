@@ -4,8 +4,8 @@ import { define, attr, mixins, Record, type, Collection } from 'type-r';
 import { expect } from 'chai';
 import { MinutesInterval } from './common';
 describe('Bugs from Volicon Observer', function () {
-    describe('Serialization', function () {
-        it('null attribute values should call has.parse()', function () {
+    describe('Attribute serialization', function () {
+        it('should call has.parse() when null attribute value is passed', function () {
             var Test = (function (_super) {
                 tslib_1.__extends(Test, _super);
                 function Test() {

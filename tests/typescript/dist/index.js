@@ -997,8 +997,8 @@
                 this.create = Transactional_1.create;
             }
         };
-        Transactional.create = function (a, b) {
-            return new this(a, b);
+        Transactional.create = function (a, b, c) {
+            return new this(a, b, c);
         };
         Transactional.prototype.dispose = function () {
             if (this._disposed)
@@ -1229,18 +1229,20 @@
             if (options === void 0) { options = {}; }
             var isRoot = begin(this), changes = [], nested = [], _attributes = this._attributes, values = options.parse ? this.parse(a_values, options) : a_values;
             var unknown;
-            if (shouldBeAnObject(this, values)) {
-                for (var name_1 in values) {
-                    var spec = _attributes[name_1];
-                    if (spec) {
-                        if (spec.doUpdate(values[name_1], this, options, nested)) {
-                            changes.push(name_1);
-                        }
+            for (var name_1 in values) {
+                var spec = _attributes[name_1];
+                if (spec) {
+                    if (options.lazyRelations
+                        && spec.type
+                        && (spec.type.isTypestreamModel || spec.type.isTypestreamCollection))
+                        continue;
+                    if (spec.doUpdate(values[name_1], this, options, nested)) {
+                        changes.push(name_1);
                     }
-                    else {
-                        unknown || (unknown = []);
-                        unknown.push("'" + name_1 + "'");
-                    }
+                }
+                else {
+                    unknown || (unknown = []);
+                    unknown.push("'" + name_1 + "'");
                 }
             }
             if (changes.length && markAsDirty(this, options)) {
@@ -1301,7 +1303,7 @@
             options.getHooks = options.getHooks.slice();
             options.transforms = options.transforms.slice();
             options.changeHandlers = options.changeHandlers.slice();
-            var value = options.value, type = options.type, parse = options.parse, toJSON = options.toJSON, changeEvents = options.changeEvents, validate = options.validate, getHooks = options.getHooks, transforms = options.transforms, changeHandlers = options.changeHandlers;
+            var value = options.value, type = options.type, parse = options.parse, toJSON = options.toJSON, changeEvents = options.changeEvents, properties = options.properties, lazyRelations = options.lazyRelations, validate = options.validate, getHooks = options.getHooks, transforms = options.transforms, changeHandlers = options.changeHandlers;
             this.value = value;
             this.type = type;
             if (!options.hasCustomDefault && type) {
@@ -1315,6 +1317,8 @@
             }
             this.propagateChanges = changeEvents !== false;
             this.toJSON = toJSON === void 0 ? this.toJSON : toJSON;
+            this.properties = properties == void 0 ? {} : properties;
+            this.lazyRelations = lazyRelations == void 0 ? this.lazyRelations : lazyRelations;
             this.validate = validate || this.validate;
             if (options.isRequired) {
                 this.validate = wrapIsRequired(this.validate);
@@ -1488,7 +1492,7 @@
                 if (next._shared && !(next._shared & ItemsBehavior.persistent)) {
                     this._log('error', 'aggregated collection attribute is assigned with shared collection', next, record);
                 }
-                return options.merge ? next.clone() : next;
+                return next;
             }
             return this.type.create(next, options);
         };
@@ -1603,6 +1607,12 @@
             return this.metadata({
                 changeHandlers: this.options.changeHandlers.concat(handleEventsSubscribtion)
             });
+        };
+        ChainableAttributeSpec.prototype.properties = function (props) {
+            return this.metadata({ properties: props });
+        };
+        ChainableAttributeSpec.prototype.lazyRelations = function (value) {
+            return this.metadata({ lazyRelations: value });
         };
         Object.defineProperty(ChainableAttributeSpec.prototype, "has", {
             get: function () {
@@ -1987,7 +1997,9 @@
         SharedType.prototype.convert = function (next, prev, record, options) {
             if (next == null || next instanceof this.type)
                 return next;
-            var implicitObject = new this.type(next, options, shareAndListen);
+            var implicitObject = this.type.create
+                ? this.type.create(next, options, shareAndListen)
+                : new this.type(next, options, shareAndListen);
             aquire$1(record, implicitObject, this.name);
             return implicitObject;
         };
@@ -2584,7 +2596,6 @@
         return CollectionTransaction;
     }());
     function logAggregationError(collection) {
-        collection._log('error', 'added records already have an owner', collection._aggregationError);
         collection._aggregationError = void 0;
     }
 
@@ -16108,8 +16119,8 @@
     });
 
     describe('Bugs from Volicon Observer', function () {
-        describe('Serialization', function () {
-            it('null attribute values should call has.parse()', function () {
+        describe('Attribute serialization', function () {
+            it('should call has.parse() when null attribute value is passed', function () {
                 var Test = (function (_super) {
                     __extends(Test, _super);
                     function Test() {

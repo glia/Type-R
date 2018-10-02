@@ -131,7 +131,8 @@ export const UpdateRecordMixin = {
 
         let unknown;
 
-        if( shouldBeAnObject( this, values ) ){
+        // ADDED Removed to allow learnable variables to be set with numbers tranparently
+        //if( shouldBeAnObject( this, values ) ){
             for( let name in values ){
                 const spec = _attributes[ name ];
 
@@ -157,7 +158,7 @@ export const UpdateRecordMixin = {
             if( unknown ){
                 // this._log( 'warn', `Undefined attributes ${ unknown.join(', ')} are ignored!`, values );
             }
-        }
+        //}
         
         if( changes.length && markAsDirty( this, options ) ){
             return new RecordTransaction( this, isRoot, nested, changes );
