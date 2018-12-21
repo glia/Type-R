@@ -208,7 +208,7 @@ expect( <span class="hljs-keyword">typeof</span> users.toJSON()[ <span class="hl
 <pre><code class="highlight javascript">@define UIState extends Record {
     <span class="hljs-keyword">static</span> attributes = {
         <span class="hljs-attr">users</span> : User.Collection,
-        <span class="hljs-attr">selectedUser</span> : <span class="hljs-keyword">from</span>( <span class="hljs-string">'users'</span> )
+        <span class="hljs-attr">selectedUser</span> : memberOf( <span class="hljs-string">'users'</span> )
     }
 }
 
@@ -225,7 +225,7 @@ uiState.users.fetch();
     <span class="hljs-comment">// For collections and more complex types attribute type must be provided explicitly</span>
     <span class="hljs-meta">@type</span>( User.Collection ).as users : Collection&lt;User&gt;
 
-    <span class="hljs-meta">@from</span>( <span class="hljs-string">'users'</span> ).as selectedUser : User
+    <span class="hljs-meta">@memberOf</span>( <span class="hljs-string">'users'</span> ).as selectedUser : User
 }
 
 <span class="hljs-keyword">const</span> uiState = <span class="hljs-keyword">new</span> UIState();

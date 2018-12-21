@@ -130,7 +130,7 @@ Records and collections form an aggregation tree with deeply observable changes,
 @define UIState extends Record {
     static attributes = {
         users : User.Collection,
-        selectedUser : from( 'users' )
+        selectedUser : memberOf( 'users' )
     }
 }
 
@@ -149,7 +149,7 @@ uiState.users.fetch();
     // For collections and more complex types attribute type must be provided explicitly
     @type( User.Collection ).as users : Collection<User>
 
-    @from( 'users' ).as selectedUser : User
+    @memberOf( 'users' ).as selectedUser : User
 }
 
 const uiState = new UIState();
