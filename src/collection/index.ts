@@ -587,7 +587,11 @@ function toElements<R extends Record>( collection : Collection<R>, elements : El
 
 Record.Collection = Collection;
 
+const noOp = x => x;
+
 function toPredicateFunction<R>( iteratee : Predicate<R> ){
+    if( iteratee == null ) return noOp;
+
     switch( typeof iteratee ){
         case 'function' : return iteratee;
         case 'object' :
