@@ -9,7 +9,6 @@ export interface CollectionOptions extends TransactionOptions {
     comparator?: GenericComparator;
     model?: typeof Record;
 }
-export declare type Predicate<R> = ((val: R, key?: number) => boolean) | Partial<R>;
 export interface CollectionDefinition extends TransactionalDefinition {
     model?: typeof Record;
     itemEvents?: EventsDefinition;
@@ -44,7 +43,7 @@ export declare class Collection<R extends Record = Record> extends Transactional
         id?: string;
         cid?: string;
     }): R;
-    each(iteratee: (val: R, key?: number) => void, context?: any): void;
+    [Symbol.iterator](): IterableIterator<R>;
     updateEach(iteratee: (val: R, key?: number) => void): void;
     _validateNested(errors: {}): number;
     model: typeof Record;
@@ -68,7 +67,6 @@ export declare class Collection<R extends Record = Record> extends Transactional
     remove(recordsOrIds: any, options?: CollectionOptions): R[] | R;
     _createTransaction(a_elements: ElementsArg<R>, options?: TransactionOptions): CollectionTransaction | void;
     static _metatype: typeof AggregatedType;
-    pluck<K extends keyof R>(key: K): R[K][];
     sort(options?: TransactionOptions): this;
     unset(modelOrId: R | string, options?: any): R;
     modelId(attrs: {}): any;
@@ -80,20 +78,10 @@ export declare class Collection<R extends Record = Record> extends Transactional
     pop(options?: CollectionOptions): R;
     unshift(model: ElementsArg<R>, options?: CollectionOptions): any;
     shift(options?: CollectionOptions): R;
-    slice(begin?: number, end?: number): R[];
-    indexOf(modelOrId: string | Partial<R>): number;
-    filter(iteratee: Predicate<R>, context?: any): R[];
-    find(iteratee: Predicate<R>, context?: any): R;
-    some(iteratee: Predicate<R>, context?: any): boolean;
-    forEach(iteratee: (val: R, key?: number) => void, context?: any): void;
-    [Symbol.iterator](): IterableIterator<R>;
-    values(): IterableIterator<R>;
-    entries(): IterableIterator<[number, R]>;
-    every(iteratee: Predicate<R>, context?: any): boolean;
     includes(idOrObj: string | Partial<R>): boolean;
-    map<T>(iteratee: (val: R, key?: number) => T, context?: any): T[];
-    reduce<T>(iteratee: (previousValue: R, currentValue: R, currentIndex?: number) => R): R;
-    reduce<T>(iteratee: (previousValue: T, currentValue: R, currentIndex?: number) => T, init?: any): T;
+}
+import { ArrayMixin } from './arrayMethods';
+export interface Collection<R extends Record> extends ArrayMixin<R> {
 }
 export declare type LiveUpdatesOption = boolean | ((x: any) => boolean);
 export declare type ElementsArg<R = Record> = Partial<R> | Partial<R>[];

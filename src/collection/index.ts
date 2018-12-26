@@ -1,5 +1,5 @@
 import { IOPromise, startIO } from '../io-tools';
-import { define, definitions, EventMap, eventsApi, EventsDefinition, Logger, logger, LogLevel, Mixable, mixinRules, TheType, tools } from '../object-plus';
+import { define, definitions, EventMap, eventsApi, EventsDefinition, Logger, logger, LogLevel, Mixable, mixinRules, TheType, tools, mixins } from '../object-plus';
 import { AggregatedType, Record, SharedType } from '../record';
 import { CloneOptions, ItemsBehavior, Transactional, TransactionalDefinition, transactionApi, TransactionOptions } from '../transactions';
 import { AddOptions, addTransaction } from './add';
@@ -20,8 +20,6 @@ export interface CollectionOptions extends TransactionOptions {
     comparator? : GenericComparator
     model? : typeof Record
 }
-
-export type Predicate<R> = ( ( val : R, key? : number ) => boolean ) | Partial<R>;
 
 export interface CollectionDefinition extends TransactionalDefinition {
     model? : typeof Record,
@@ -46,6 +44,7 @@ export interface CollectionConstructor<R extends Record = Record > extends TheTy
     _changeEventName : 'changes',
     _aggregationError : null
 })
+@mixins( ArrayMixin )
 @definitions({
     comparator : mixinRules.value,
     model : mixinRules.protoValue,
@@ -178,15 +177,15 @@ export class Collection< R extends Record = Record> extends Transactional implem
         }        
     }
 
-    each( iteratee : ( val : R, key? : number ) => void, context? : any ) : void {
-        this.models.forEach( iteratee, context );
+    [ Symbol.iterator ]() : IterableIterator<R> {
+        return this.models[ Symbol.iterator ]();
     }
 
     // Loop through the members in the scope of transaction.
     // Transactional version of each()
     updateEach( iteratee : ( val : R, key? : number ) => void ){
         const isRoot = transactionApi.begin( this );
-        this.models.forEach( iteratee );
+        this.each( iteratee );
         isRoot && transactionApi.commit( this );
     }
 
@@ -265,7 +264,7 @@ export class Collection< R extends Record = Record> extends Transactional implem
     }
 
     toJSON( options? : object ) : any {
-        return this.models.map( model => model.toJSON( options ) );
+        return this.map( model => model.toJSON( options ) );
     }
 
     // Apply bulk in-place object update in scope of ad-hoc transaction 
@@ -431,10 +430,6 @@ export class Collection< R extends Record = Record> extends Transactional implem
      * Collection manipulation methods
      */
 
-    pluck<K extends keyof R>( key : K ) : R[K][] {
-        return this.models.map( model => model[ key ] );
-    }
-
     sort( options : TransactionOptions = {} ) : this {
         if( sortElements( this, options ) ){
             const isRoot = begin( this );
@@ -518,61 +513,16 @@ export class Collection< R extends Record = Record> extends Transactional implem
         return model;
     }
 
-    // Slice out a sub-array of models from the collection.
-    slice( begin? : number, end? : number ) : R[] {
-        return this.models.slice( begin, end );
-    }
-  
-    indexOf( modelOrId : string | Partial<R> ) : number {
-        return this.models.indexOf( this.get( modelOrId ) );
-    }
-
-    filter( iteratee : Predicate<R>, context? : any ) : R[] {
-        return this.models.filter( toPredicateFunction( iteratee ), context );
-    }
-
-    find( iteratee : Predicate<R>, context? : any ) : R {
-        return this.models.find( toPredicateFunction( iteratee ), context );
-    }
-
-    some( iteratee : Predicate<R>, context? : any ) : boolean {
-        return this.models.some( toPredicateFunction( iteratee ), context );
-    }
-
-    forEach( iteratee : ( val : R, key? : number ) => void, context? : any ) : void {
-        this.models.forEach( iteratee, context );
-    }
-    
-    [ Symbol.iterator ]() : IterableIterator<R> {
-        return this.models[ Symbol.iterator ]();
-    }
-
-    values() : IterableIterator<R> {
-        return this.models.values();
-    }
-
-    entries() : IterableIterator<[ number, R ]>{
-        return this.models.entries();
-    }
-
-    every( iteratee : Predicate<R>, context? : any ) : boolean {
-        return this.models.every( toPredicateFunction( iteratee ), context );
-    }
-
     includes( idOrObj : string | Partial<R> ){
         return Boolean( this.get( idOrObj ) );
     }
+}
 
-    // Map members to an array
-    map<T>( iteratee : ( val : R, key? : number ) => T, context? : any ) : T[]{
-        return this.models.map( iteratee, context );
-    }
 
-    reduce<T>( iteratee : (previousValue: R, currentValue: R, currentIndex?: number ) => R ) : R
-    reduce<T>( iteratee : (previousValue: T, currentValue: R, currentIndex?: number ) => T, init? : any ) : T
-    reduce<T>( iteratee : (previousValue: any, currentValue: any, currentIndex?: number ) => any, init? : any ) : T | R {
-        return init === void 0 ? this.models.reduce( iteratee ) : this.models.reduce( iteratee, init );
-    }
+import { ArrayMixin } from './arrayMethods'
+
+export interface Collection<R extends Record> extends ArrayMixin<R>{
+
 }
 
 export type LiveUpdatesOption = boolean | ( ( x : any ) => boolean );
@@ -586,25 +536,3 @@ function toElements<R extends Record>( collection : Collection<R>, elements : El
 }
 
 Record.Collection = Collection;
-
-const noOp = x => x;
-
-function toPredicateFunction<R>( iteratee : Predicate<R> ){
-    if( iteratee == null ) return noOp;
-
-    switch( typeof iteratee ){
-        case 'function' : return iteratee;
-        case 'object' :
-            const keys = Object.keys( iteratee );
-            
-            return x => {
-                for( let key of keys ){
-                    if( iteratee[ key ] !== x[ key ] )
-                        return false;
-                }
-
-                return true;
-            }
-        default : throw new Error( 'Invalid iteratee' );
-    }
-}
