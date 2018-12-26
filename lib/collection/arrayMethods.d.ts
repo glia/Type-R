@@ -7,10 +7,11 @@ export declare abstract class ArrayMixin<R> {
     reduce<T>(iteratee: (previousValue: T, currentValue: R, currentIndex?: number) => T, init?: any): T;
     slice(begin?: number, end?: number): R[];
     indexOf(modelOrId: string | Partial<R>): number;
+    includes(idOrObj: string | Partial<R>): boolean;
     filter(iteratee: Predicate<R>, context?: any): R[];
     find(iteratee: Predicate<R>, context?: any): R;
     some(iteratee: Predicate<R>, context?: any): boolean;
-    each(a_fun: (val: R, key?: number) => void, context?: any): void;
+    each<T>(a_fun: (val: R, key?: number) => T, context?: any): T;
     forEach(iteratee: (val: R, key?: number) => void, context?: any): void;
     values(): IterableIterator<R>;
     entries(): IterableIterator<[number, R]>;

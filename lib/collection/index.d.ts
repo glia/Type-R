@@ -78,7 +78,6 @@ export declare class Collection<R extends Record = Record> extends Transactional
     pop(options?: CollectionOptions): R;
     unshift(model: ElementsArg<R>, options?: CollectionOptions): any;
     shift(options?: CollectionOptions): R;
-    includes(idOrObj: string | Partial<R>): boolean;
 }
 import { ArrayMixin } from './arrayMethods';
 export interface Collection<R extends Record> extends ArrayMixin<R> {

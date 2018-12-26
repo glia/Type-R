@@ -36,19 +36,25 @@ export abstract class ArrayMixin<R> {
         return this.models.indexOf( this.get( modelOrId ) );
     }
 
+    includes( idOrObj : string | Partial<R> ) : boolean {
+        return Boolean( this.get( idOrObj ) );
+    }
+
     filter( iteratee : Predicate<R>, context? : any ) : R[] {
-        return this.models.filter( toPredicateFunction( iteratee ), context );
+        const fun = toPredicateFunction( iteratee );
+        return this.map( m => fun( m ) ? m : void 0, context );
     }
 
     find( iteratee : Predicate<R>, context? : any ) : R {
-        return this.models.find( toPredicateFunction( iteratee ), context );
+        const fun = toPredicateFunction( iteratee );
+        return this.each( m => fun( m ) ? m : void 0, context );
     }
 
     some( iteratee : Predicate<R>, context? : any ) : boolean {
-        return this.models.some( toPredicateFunction( iteratee ), context );
+        return Boolean( this.find( iteratee, context ) );
     }
 
-    each( a_fun : ( val : R, key? : number ) => void, context? : any ) : void {
+    each<T>( a_fun : ( val : R, key? : number ) => T, context? : any ) : T {
         const { models } = this,
             iteratee = context ? a_fun.bind( context ) : a_fun;
 
@@ -71,7 +77,8 @@ export abstract class ArrayMixin<R> {
     }
 
     every( iteratee : Predicate<R>, context? : any ) : boolean {
-        return this.models.every( toPredicateFunction( iteratee ), context );
+        const fun = toPredicateFunction( iteratee );
+        return this.each( m => fun( m ) ? void 0 : false, context ) === void 0;
     }
 
     pluck<K extends keyof R>( key : K ) : R[K][] {
@@ -81,7 +88,7 @@ export abstract class ArrayMixin<R> {
 
 const noOp = x => x;
 
-function toPredicateFunction<R>( iteratee : Predicate<R>, context? : any ){
+function toPredicateFunction<R>( iteratee : Predicate<R> ){
     if( iteratee == null ) return noOp;
 
     switch( typeof iteratee ){

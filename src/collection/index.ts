@@ -512,10 +512,6 @@ export class Collection< R extends Record = Record> extends Transactional implem
         this.remove( model, { unset : true, ...options } );
         return model;
     }
-
-    includes( idOrObj : string | Partial<R> ){
-        return Boolean( this.get( idOrObj ) );
-    }
 }
 
 
