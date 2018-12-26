@@ -1,16 +1,27 @@
+import { Record } from '../record'
+
 export type Predicate<R> = ( ( val : R, key? : number ) => boolean ) | Partial<R>;
 
-export abstract class ArrayMixin<R> {
+/**
+ * Optimized array methods.
+ */
+export abstract class ArrayMixin<R extends Record> {
     models : R[]
     abstract get( modelOrId : string | Partial<R> ) : R;
 
-    map<T>( a_fun : ( val : R, key? : number ) => T, context? : any ) : T[]{
+    /**
+     * Map and optionally filter the collection.
+     * @param mapFilter filter an element out if `undefined` is returned 
+     * @param context optional `this` for `mapFilter`
+     */
+    map<T>( mapFilter : ( val : R, key? : number ) => T, context? : any ) : T[]{
         const { models } = this,
-            res = Array( models.length ),
-            iteratee = context ? a_fun.bind( context ) : a_fun;
+            { length } = models,
+            res = Array( length ),
+            fun = context ? mapFilter.bind( context ) : mapFilter;
 
-        for( var i = 0, j = 0; i < models.length; i++ ){
-            const val = iteratee( models[ i ], i );
+        for( var i = 0, j = 0; i < length; i++ ){
+            const val = fun( models[ i ], i );
             val === void 0 || ( res[ j++ ] = val );
         }
 
@@ -21,6 +32,26 @@ export abstract class ArrayMixin<R> {
         return res;
     }
 
+    /**
+     * Iterate through collection optionally returning the value.
+     * @param doWhile break the loop if anything but `undefined` is returned, and return this value.
+     * @param context optional `this` for `doWhile`.
+     */
+    each<T>( doWhile : ( val : R, key? : number ) => T, context? : any ) : T {
+        const { models } = this,
+            { length } = models,
+            iteratee = context ? doWhile.bind( context ) : doWhile;
+
+        for( let i = 0; i < length; i++ ){
+            const res = iteratee( models[ i ], i );
+            if( res !== void 0 ) return res;
+        }
+    }
+
+    /**
+     * Proxy for the `array.reduce()`
+     * @param iteratee 
+     */
     reduce<T>( iteratee : (previousValue: R, currentValue: R, currentIndex?: number ) => R ) : R
     reduce<T>( iteratee : (previousValue: T, currentValue: R, currentIndex?: number ) => T, init? : any ) : T
     reduce<T>( iteratee : (previousValue: any, currentValue: any, currentIndex?: number ) => any, init? : any ) : T | R {
@@ -54,16 +85,6 @@ export abstract class ArrayMixin<R> {
         return Boolean( this.find( iteratee, context ) );
     }
 
-    each<T>( a_fun : ( val : R, key? : number ) => T, context? : any ) : T {
-        const { models } = this,
-            iteratee = context ? a_fun.bind( context ) : a_fun;
-
-        for( let i = 0; i < models.length; i++ ){
-            const res = iteratee( models[ i ], i );
-            if( res !== void 0 ) return res;
-        }
-    }
-
     forEach( iteratee : ( val : R, key? : number ) => void, context? : any ) : void {
         this.each( iteratee, context );
     }
@@ -83,6 +104,15 @@ export abstract class ArrayMixin<R> {
 
     pluck<K extends keyof R>( key : K ) : R[K][] {
         return this.map( model => model[ key ] );
+    }
+
+    first() : R { return this.models[ 0 ]; }
+
+    last() : R { return this.models[ this.models.length - 1 ]; }
+
+    at( a_index : number ) : R {
+        const index = a_index < 0 ? a_index + this.models.length : a_index;    
+        return this.models[ index ];
     }
 }
 

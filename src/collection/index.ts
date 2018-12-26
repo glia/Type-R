@@ -246,13 +246,6 @@ export class Collection< R extends Record = Record> extends Transactional implem
 
     initialize(){}
 
-    first() : R { return this.models[ 0 ]; }
-    last() : R { return this.models[ this.models.length - 1 ]; }
-    at( a_index : number ) : R {
-        const index = a_index < 0 ? a_index + this.models.length : a_index;    
-        return this.models[ index ];
-    }
-
     // Deeply clone collection, optionally setting new owner.
     clone( options : CloneOptions = {} ) : this {
         const models = this._shared & ItemsBehavior.share ? this.models : this.map( model => model.clone() ),

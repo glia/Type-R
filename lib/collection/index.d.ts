@@ -50,9 +50,6 @@ export declare class Collection<R extends Record = Record> extends Transactional
     idAttribute: string;
     constructor(records?: ElementsArg<R>, options?: CollectionOptions, shared?: number);
     initialize(): void;
-    first(): R;
-    last(): R;
-    at(a_index: number): R;
     clone(options?: CloneOptions): this;
     toJSON(options?: object): any;
     set(elements?: ElementsArg<R>, options?: TransactionOptions): this;
