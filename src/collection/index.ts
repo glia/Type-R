@@ -9,8 +9,7 @@ import { emptySetTransaction, setTransaction } from './set';
 
 
 const { trigger2 } = eventsApi,
-    { begin, commit, markAsDirty } = transactionApi,
-    { assign, defaults } = tools;
+    { begin, commit, markAsDirty } = transactionApi;
 
 let _count = 0;
 
@@ -365,7 +364,7 @@ export class Collection< R extends Record = Record> extends Transactional implem
 
         markAsDirty( this, options );
 
-        options.silent || trigger2( this, 'reset', this, defaults( { previousModels : previousModels }, options ) );
+        options.silent || trigger2( this, 'reset', this, { previousModels, ...options } );
 
         // Dispose models which are not in the updated collection.
         const { _byId } = this;
@@ -484,7 +483,7 @@ export class Collection< R extends Record = Record> extends Transactional implem
 
     // Add a model to the end of the collection.
     push(model : ElementsArg<R>, options? : CollectionOptions ) {
-        return this.add(model, assign({at: this.length}, options));
+        return this.add(model, { at: this.length, ...options });
     }
 
     // Remove a model from the end of the collection.
@@ -496,7 +495,7 @@ export class Collection< R extends Record = Record> extends Transactional implem
 
     // Add a model to the beginning of the collection.
     unshift(model : ElementsArg<R>, options? : CollectionOptions ) {
-        return this.add(model, assign({at: 0}, options));
+        return this.add(model, { at: 0, ...options });
     }
   
     // Remove a model from the beginning of the collection.

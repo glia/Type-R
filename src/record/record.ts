@@ -134,7 +134,7 @@ export class Record extends Transactional implements IORecord, AttributesContain
     }
 
     changedAttributes( diff? : {} ) : boolean | {} {
-        if( !diff ) return this.hasChanged() ? assign( {}, this.changed ) : false;
+        if( !diff ) return this.hasChanged() ? { ...this.changed } : false;
 
         var val, changed : {} | boolean = false,
             old          = this._transaction ? this._previousAttributes : this.attributes,

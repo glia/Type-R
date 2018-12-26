@@ -176,7 +176,7 @@ export class AnyType implements AttributeUpdatePipeline {
         this.options = a_options;
 
         // Clone options.
-        const options : AttributeOptions = assign( { getHooks : [], transforms : [], changeHandlers : [] }, a_options );
+        const options : AttributeOptions = { getHooks : [], transforms : [], changeHandlers : [], ...a_options };
         options.getHooks = options.getHooks.slice();
         options.transforms = options.transforms.slice();
         options.changeHandlers = options.changeHandlers.slice();
