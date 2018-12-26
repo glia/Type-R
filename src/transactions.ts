@@ -22,6 +22,9 @@ export enum ItemsBehavior {
 }
 
 // Transactional object interface
+
+export interface Transactional extends Messenger {}
+
 @define
 @definitions({
     endpoint : mixinRules.value
@@ -53,18 +56,6 @@ export abstract class Transactional implements Messenger, IONode, Validatable, T
         return new (this as any)( a, b );
     }
 
-    /** Generic class factory. May be overridden for abstract classes. Not inherited. */
-    on : ( events : string | CallbacksByEvents, callback, context? ) => this
-    once : ( events : string | CallbacksByEvents, callback, context? ) => this
-    off : ( events? : string | CallbacksByEvents, callback?, context? ) => this
-    trigger      : (name : string, a?, b?, c?, d?, e? ) => this
-
-    stopListening : ( source? : Messenger, a? : string | CallbacksByEvents, b? : Function ) => this
-    listenTo : ( source : Messenger, a : string | CallbacksByEvents, b? : Function ) => this
-    listenToOnce : ( source : Messenger, a : string | CallbacksByEvents, b? : Function ) => this
-    
-    _disposed : boolean;
-
     // State accessor. 
     readonly __inner_state__ : any;
 
@@ -81,20 +72,7 @@ export abstract class Transactional implements Messenger, IONode, Validatable, T
         this.stopListening();
         this._disposed = true;
     }
-
-    // Must be called at the end of the constructor in the subclass.
-    initialize() : void {}
-
-    /** @private */
-    _events : eventsApi.HandlersByEvent = void 0;
-
-    /** @private */
-    _listeningTo : MessengersByCid
-
-    /** @private */
-    _localEvents : eventsApi.EventMap
-
-    cid : string
+    
     cidPrefix : string
 
     // Unique version token replaced on change
