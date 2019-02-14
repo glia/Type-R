@@ -1,5 +1,5 @@
 import { IOEndpoint, IONode, IOPromise } from './io-tools';
-import { CallbacksByEvents, eventsApi, Logger, LogLevel, Messenger, MessengerDefinition, MessengersByCid, MixinsState } from './object-plus';
+import { EventCallbacks, eventsApi, Logger, LogLevel, Messenger, MessengerDefinition, MessengersByCid, MixinsState } from './object-plus';
 import { Traversable } from './traversable';
 import { ChildrenErrors, Validatable, ValidationError } from './validation';
 export interface TransactionalDefinition extends MessengerDefinition {
@@ -19,13 +19,13 @@ export declare abstract class Transactional implements Messenger, IONode, Valida
     static onDefine(definitions: TransactionalDefinition, BaseClass: typeof Transactional): void;
     static onExtend(BaseClass: typeof Transactional): void;
     static create(a: any, b?: any): Transactional;
-    on: (events: string | CallbacksByEvents, callback: any, context?: any) => this;
-    once: (events: string | CallbacksByEvents, callback: any, context?: any) => this;
-    off: (events?: string | CallbacksByEvents, callback?: any, context?: any) => this;
+    on: (events: string | EventCallbacks<this>, callback: any, context?: any) => this;
+    once: (events: string | EventCallbacks<this>, callback: any, context?: any) => this;
+    off: (events?: string | EventCallbacks<this>, callback?: any, context?: any) => this;
     trigger: (name: string, a?: any, b?: any, c?: any, d?: any, e?: any) => this;
-    stopListening: (source?: Messenger, a?: string | CallbacksByEvents, b?: Function) => this;
-    listenTo: (source: Messenger, a: string | CallbacksByEvents, b?: Function) => this;
-    listenToOnce: (source: Messenger, a: string | CallbacksByEvents, b?: Function) => this;
+    stopListening: (source?: Messenger, a?: string | EventCallbacks<this>, b?: Function) => this;
+    listenTo: (source: Messenger, a: string | EventCallbacks<this>, b?: Function) => this;
+    listenToOnce: (source: Messenger, a: string | EventCallbacks<this>, b?: Function) => this;
     _disposed: boolean;
     readonly __inner_state__: any;
     _shared?: number;

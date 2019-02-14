@@ -1,5 +1,5 @@
 import { abortIO, IOEndpoint, IONode, IOPromise } from './io-tools';
-import { CallbacksByEvents, define, definitions, eventsApi, Logger, LogLevel, Messenger, MessengerDefinition, MessengersByCid, mixinRules, mixins, MixinsState, throwingLogger } from './object-plus';
+import { EventCallbacks, define, definitions, eventsApi, Logger, LogLevel, Messenger, MessengerDefinition, MessengersByCid, mixinRules, mixins, MixinsState, throwingLogger } from './object-plus';
 import { resolveReference, Traversable } from './traversable';
 import { ChildrenErrors, Validatable, ValidationError } from './validation';
 
@@ -54,14 +54,14 @@ export abstract class Transactional implements Messenger, IONode, Validatable, T
     }
 
     /** Generic class factory. May be overridden for abstract classes. Not inherited. */
-    on : ( events : string | CallbacksByEvents, callback, context? ) => this
-    once : ( events : string | CallbacksByEvents, callback, context? ) => this
-    off : ( events? : string | CallbacksByEvents, callback?, context? ) => this
+    on : ( events : string | EventCallbacks<this>, callback, context? ) => this
+    once : ( events : string | EventCallbacks<this>, callback, context? ) => this
+    off : ( events? : string | EventCallbacks<this>, callback?, context? ) => this
     trigger      : (name : string, a?, b?, c?, d?, e? ) => this
 
-    stopListening : ( source? : Messenger, a? : string | CallbacksByEvents, b? : Function ) => this
-    listenTo : ( source : Messenger, a : string | CallbacksByEvents, b? : Function ) => this
-    listenToOnce : ( source : Messenger, a : string | CallbacksByEvents, b? : Function ) => this
+    stopListening : ( source? : Messenger, a? : string | EventCallbacks<this>, b? : Function ) => this
+    listenTo : ( source : Messenger, a : string | EventCallbacks<this>, b? : Function ) => this
+    listenToOnce : ( source : Messenger, a : string | EventCallbacks<this>, b? : Function ) => this
     
     _disposed : boolean;
 
