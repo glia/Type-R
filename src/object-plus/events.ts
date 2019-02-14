@@ -94,14 +94,14 @@ export class Messenger implements Mixable, EventSource {
     /** Method is called at the end of the constructor */
     initialize() : void {}
     
-    on( events : string | EventCallbacks<this>, callback, context? ) : this {
+    on( events : string | EventCallbacks<this>, callback?, context? ) : this {
         if( typeof events === 'string' ) strings( on, this, events, callback, context );
         else for( let name in events ) strings( on, this, name, events[ name ], context || callback );
 
         return this;
     }
 
-    once( events : string | EventCallbacks<this>, callback, context? ) : this {
+    once( events : string | EventCallbacks<this>, callback?, context? ) : this {
         if( typeof events === 'string' ) strings( once, this, events, callback, context );
         else for( let name in events ) strings( once, this, name, events[ name ], context || callback );
 

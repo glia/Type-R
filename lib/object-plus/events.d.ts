@@ -31,8 +31,8 @@ export declare class Messenger implements Mixable, EventSource {
     _localEvents: EventMap;
     constructor();
     initialize(): void;
-    on(events: string | EventCallbacks<this>, callback: any, context?: any): this;
-    once(events: string | EventCallbacks<this>, callback: any, context?: any): this;
+    on(events: string | EventCallbacks<this>, callback?: any, context?: any): this;
+    once(events: string | EventCallbacks<this>, callback?: any, context?: any): this;
     off(events?: string | EventCallbacks<this>, callback?: any, context?: any): this;
     trigger(name: string, a?: any, b?: any, c?: any, d?: any, e?: any): this;
     listenTo(source: Messenger, a: string | EventCallbacks<this>, b?: Function): this;

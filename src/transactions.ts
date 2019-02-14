@@ -54,8 +54,8 @@ export abstract class Transactional implements Messenger, IONode, Validatable, T
     }
 
     /** Generic class factory. May be overridden for abstract classes. Not inherited. */
-    on : ( events : string | EventCallbacks<this>, callback, context? ) => this
-    once : ( events : string | EventCallbacks<this>, callback, context? ) => this
+    on : ( events : string | EventCallbacks<this>, callback?, context? ) => this
+    once : ( events : string | EventCallbacks<this>, callback?, context? ) => this
     off : ( events? : string | EventCallbacks<this>, callback?, context? ) => this
     trigger      : (name : string, a?, b?, c?, d?, e? ) => this
 
