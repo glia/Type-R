@@ -34,7 +34,8 @@ export interface MessengersByCid {
 }
 
 /** @hidden */
-export type CallbacksByEvents = { [ events : string ] : Function }
+export type EventCallbacks<Context> = { [ events : string ] : EventCallback<Context> }
+export type EventCallback<Context> = ( this : Context, ...args : any[] ) => void
 
 /*************************
  * Messenger is mixable class with capabilities of sending and receiving synchronous events.
@@ -93,21 +94,21 @@ export class Messenger implements Mixable, EventSource {
     /** Method is called at the end of the constructor */
     initialize() : void {}
     
-    on( events : string | CallbacksByEvents, callback, context? ) : this {
+    on( events : string | EventCallbacks<this>, callback?, context? ) : this {
         if( typeof events === 'string' ) strings( on, this, events, callback, context );
         else for( let name in events ) strings( on, this, name, events[ name ], context || callback );
 
         return this;
     }
 
-    once( events : string | CallbacksByEvents, callback, context? ) : this {
+    once( events : string | EventCallbacks<this>, callback?, context? ) : this {
         if( typeof events === 'string' ) strings( once, this, events, callback, context );
         else for( let name in events ) strings( once, this, name, events[ name ], context || callback );
 
         return this;
     }
 
-    off( events? : string | CallbacksByEvents, callback?, context? ) : this {
+    off( events? : string | EventCallbacks<this>, callback?, context? ) : this {
         if( !events ) off( this, void 0, callback, context );
         else if( typeof events === 'string' ) strings( off, this, events, callback, context );
         else for( let name in events ) strings( off, this, name, events[ name ], context || callback );
@@ -126,7 +127,7 @@ export class Messenger implements Mixable, EventSource {
         return this;
     }
 
-    listenTo( source : Messenger, a : string | CallbacksByEvents, b? : Function ) : this {
+    listenTo( source : Messenger, a : string | EventCallbacks<this>, b? : Function ) : this {
         if( source ){
             addReference( this, source );
             source.on( a, !b && typeof a === 'object' ? this : b, this );
@@ -135,7 +136,7 @@ export class Messenger implements Mixable, EventSource {
         return this;
     }
 
-    listenToOnce( source : Messenger, a : string | CallbacksByEvents, b? : Function ) : this {
+    listenToOnce( source : Messenger, a : string | EventCallbacks<this>, b? : Function ) : this {
         if( source ){
             addReference( this, source );
             source.once( a, !b && typeof a === 'object' ? this : b, this );
@@ -144,7 +145,7 @@ export class Messenger implements Mixable, EventSource {
         return this;
     }
 
-    stopListening( a_source? : Messenger, a? : string | CallbacksByEvents, b? : Function ) : this {
+    stopListening( a_source? : Messenger, a? : string | EventCallbacks<this>, b? : Function ) : this {
         const { _listeningTo } = this;
         if( _listeningTo ){
             const removeAll = !( a || b ),

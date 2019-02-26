@@ -1,5 +1,5 @@
 import { abortIO, IOEndpoint, IONode, IOPromise } from './io-tools';
-import { CallbacksByEvents, define, definitions, eventsApi, Logger, LogLevel, Messenger, MessengerDefinition, MessengersByCid, mixinRules, mixins, MixinsState, throwingLogger } from './object-plus';
+import { EventCallbacks, define, definitions, eventsApi, Logger, LogLevel, Messenger, MessengerDefinition, MessengersByCid, mixinRules, mixins, MixinsState, throwingLogger } from './object-plus';
 import { resolveReference, Traversable } from './traversable';
 import { ChildrenErrors, Validatable, ValidationError } from './validation';
 

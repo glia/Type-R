@@ -1,6 +1,6 @@
 {
   "name": "type-r",
-  "version": "3.0.3",
+  "version": "3.0.5",
   "description": "Serializable, validated, and observable data layer for modern JS applications",
   "main": "./dist/index.js",
   "jsnext:main": "./lib/index.js",
@@ -18,8 +18,9 @@
     "test": "tests"
   },
   "scripts": {
-    "build:lib": "npm run compile:lib && npm run bundle:lib",
-    "compile:lib": "rm -rf ./lib && node_modules/.bin/tsc",
+    "build:lib": "yarn compile:lib && yarn bundle:lib",
+    "build:cleanup":"node_modules/.bin/rimraf ./lib",
+    "compile:lib": "yarn build:cleanup && ./node_modules/.bin/tsc",
     "bundle:lib": "node_modules/.bin/rollup --config",
     "test:backbone": "node_modules/.bin/qunit 'tests/backbone-regression/*.tst.js'",
     "test:type-r": "node_modules/.bin/jest",
@@ -80,7 +81,8 @@
     "sinon-chai": "*",
     "ts-jest": "*",
     "typescript": "*",
-    "underscore": "*"
+    "underscore": "*",
+    "rimraf": "^2.6.3"
   },
   "dependencies": {
     "isomorphic-fetch": "*",

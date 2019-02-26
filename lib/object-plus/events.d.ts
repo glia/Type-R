@@ -14,9 +14,10 @@ export declare type Property = PropertyDescriptor | (() => any);
 export interface MessengersByCid {
     [cid: string]: Messenger;
 }
-export declare type CallbacksByEvents = {
-    [events: string]: Function;
+export declare type EventCallbacks<Context> = {
+    [events: string]: EventCallback<Context>;
 };
+export declare type EventCallback<Context> = (this: Context, ...args: any[]) => void;
 export declare class Messenger implements Mixable, EventSource {
     static __super__: object;
     static mixins: MixinsState;
@@ -30,13 +31,13 @@ export declare class Messenger implements Mixable, EventSource {
     _localEvents: EventMap;
     constructor();
     initialize(): void;
-    on(events: string | CallbacksByEvents, callback: any, context?: any): this;
-    once(events: string | CallbacksByEvents, callback: any, context?: any): this;
-    off(events?: string | CallbacksByEvents, callback?: any, context?: any): this;
+    on(events: string | EventCallbacks<this>, callback?: any, context?: any): this;
+    once(events: string | EventCallbacks<this>, callback?: any, context?: any): this;
+    off(events?: string | EventCallbacks<this>, callback?: any, context?: any): this;
     trigger(name: string, a?: any, b?: any, c?: any, d?: any, e?: any): this;
-    listenTo(source: Messenger, a: string | CallbacksByEvents, b?: Function): this;
-    listenToOnce(source: Messenger, a: string | CallbacksByEvents, b?: Function): this;
-    stopListening(a_source?: Messenger, a?: string | CallbacksByEvents, b?: Function): this;
+    listenTo(source: Messenger, a: string | EventCallbacks<this>, b?: Function): this;
+    listenToOnce(source: Messenger, a: string | EventCallbacks<this>, b?: Function): this;
+    stopListening(a_source?: Messenger, a?: string | EventCallbacks<this>, b?: Function): this;
     _disposed: boolean;
     dispose(): void;
 }
