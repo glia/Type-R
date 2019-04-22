@@ -2,11 +2,11 @@ import { IOEndpoint, IONode, IOOptions, IOPromise } from '../io-tools';
 import { TransactionOptions } from '../transactions';
 export interface IORecord extends IONode {
     getEndpoint(): IOEndpoint;
-    save(options?: TransactionOptions): IOPromise<this>;
-    fetch(options?: TransactionOptions): IOPromise<this>;
-    destroy(options?: TransactionOptions): IOPromise<this>;
-    toJSON(options?: TransactionOptions): any;
-    parse(data: any, options?: TransactionOptions): any;
+    save(options?: object): IOPromise<this>;
+    fetch(options?: object): IOPromise<this>;
+    destroy(options?: object): IOPromise<this>;
+    toJSON(options?: object): any;
+    parse(data: any, options?: object): any;
     isNew(): boolean;
     id: string | number;
     set(json: object, options: TransactionOptions): this;
