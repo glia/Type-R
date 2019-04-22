@@ -1,20 +1,22 @@
 import { IOEndpoint, IONode, IOOptions, IOPromise, startIO } from '../io-tools';
+import { TransactionOptions } from '../transactions';
 
 export interface IORecord extends IONode {
     getEndpoint() : IOEndpoint
-    save( options? : IOOptions ) : IOPromise<this>
-    fetch( options? : IOOptions ) : IOPromise<this>
-    destroy( options? : IOOptions ) : IOPromise<this>
-    toJSON( options? : object ) : any
+    save( options? : TransactionOptions ) : IOPromise<this>
+    fetch( options? : TransactionOptions ) : IOPromise<this>
+    destroy( options? : TransactionOptions ) : IOPromise<this>
+    toJSON( options? : TransactionOptions ) : any
+    parse( data : any, options? : TransactionOptions ) : any
     isNew() : boolean
     id : string | number
-    set( json : object, options : object )
+    set( json : object, options : TransactionOptions ) : this
 }
 
 export const IORecordMixin = {
     save( this : IORecord, options : IOOptions = {} ){
         const endpoint = this.getEndpoint(),
-              json = this.toJSON( options );
+              json = this.toJSON({ ioMethod : 'save', ...options });
 
         return startIO(
             this,
@@ -24,7 +26,11 @@ export const IORecordMixin = {
             options,
 
             update => {
-                this.set( update, { parse : true, ...options } );
+                this.set( update, {
+                    parse : true,
+                    ioMethod : 'save',
+                    ...options
+                } );
             }
         );
     },
@@ -35,7 +41,7 @@ export const IORecordMixin = {
             this.getEndpoint().read( this.id, options, this ),
             options,
 
-            json => this.set( json, { parse : true, ...options } )
+            json => this.set( json, { parse : true, ioMethod : 'fetch', ...options } )
         );
     },
 

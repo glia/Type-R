@@ -269,7 +269,7 @@ Record and Collection has a portion of common API related to the I/O and seriali
 
 ### obj.toJSON( options? )
 
-Serialize record or collection to JSON. Used internally by I/O methods. Can be overridden to customize serialization.
+Serialize record or collection to JSON. Used internally by `save()` I/O method (`options.ioMethod === 'save'` when called from within `save()`). Can be overridden to customize serialization.
 
 Produces the JSON for the given record or collection and its aggregated members. Aggregation tree is serialized as nested JSON. Record corresponds to an object in JSON, while the collection is represented as an array of objects.
 
@@ -314,9 +314,9 @@ const book = new Book();
 book.set( bestSeller.toJSON(), { parse : true } );
 ```
 
-### `callback` obj.parse( json )
+### `callback` obj.parse( json, options? )
 
-Optional hook called to transform the JSON when it's passes to the record or collection with `set( json, { parse : true })` call. Used internally by I/O methods.
+Optional hook called to transform the JSON when it's passes to the record or collection with `set( json, { parse : true })` call. Used internally by I/O methods (`options.ioMethod` is either "save" or "fetch" when called from I/O method).
 
 If you override `toJSON()`, it usually means that you must override `parse()` as well, and vice versa.
 

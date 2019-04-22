@@ -17,6 +17,16 @@ describe( 'IO', function(){
         @define class User extends Record {
             static Collection : CollectionConstructor<User>
             static endpoint = memoryIO( testData );
+
+            parse( data, options ){
+                expect( options.ioMethod ).toBeTruthy();
+                return data;
+            }
+
+            toJSON( options? ){
+                expect( options.ioMethod ).toBeTruthy();
+                return super.toJSON( options );
+            }
     
             @auto name : string
         }
@@ -33,6 +43,7 @@ describe( 'IO', function(){
         
         it( 'create', done =>{
             const x = new User({ name : "test" });
+
             x.save().then( () => {
                 expect( x.id ).toBe( "1" );
                 done();

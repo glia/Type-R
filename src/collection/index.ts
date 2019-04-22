@@ -50,11 +50,15 @@ export interface CollectionConstructor<R extends Record = Record > extends TheTy
     itemEvents : mixinRules.merge
 })
 export class Collection< R extends Record = Record> extends Transactional implements CollectionCore, Iterable<R> {
+    /** @internal */
     _shared : number
+    /** @internal */
     _aggregationError : R[]
 
     static Subset : typeof Collection
     static Refs : CollectionConstructor
+
+    /** @internal */
     static _SubsetOf : typeof Collection
     
     createSubset( models : ElementsArg<R>, options? : CollectionOptions) : Collection<R>{
@@ -92,6 +96,7 @@ export class Collection< R extends Record = Record> extends Transactional implem
         Transactional.onDefine.call( this, definition );
     }
     
+    /** @internal */
     _itemEvents : EventMap
 
     /***********************************
@@ -101,9 +106,11 @@ export class Collection< R extends Record = Record> extends Transactional implem
     models : R[]
 
     // Polymorphic accessor for aggregated attribute's canBeUpdated().
+    /** @internal */
     get __inner_state__(){ return this.models; }
 
     // Index by id and cid
+    /** @internal */
     _byId : { [ id : string ] : R }
 
     set comparator( x : GenericComparator ){
@@ -139,11 +146,15 @@ export class Collection< R extends Record = Record> extends Transactional implem
         return this._store || ( this._store = this._owner ? this._owner.getStore() : this._defaultStore );
     }
 
+    /** @internal */
     _store : Transactional
 
     get comparator(){ return this._comparator; }
+
+    /** @internal */
     _comparator : ( a : R, b : R ) => number
 
+    /** @internal */
     _onChildrenChange( record : R, options : TransactionOptions = {}, initiator? : Transactional ){
         // Ignore updates from nested transactions.
         if( initiator === this ) return;
@@ -188,6 +199,7 @@ export class Collection< R extends Record = Record> extends Transactional implem
         isRoot && transactionApi.commit( this );
     }
 
+    /** @internal */
     _validateNested( errors : {} ) : number {
         // Don't validate if not aggregated.
         if( this._shared ) return 0;
@@ -310,6 +322,7 @@ export class Collection< R extends Record = Record> extends Transactional implem
         }
     }
 
+    /** @internal */
     _liveUpdates : object
 
     fetch( a_options : { liveUpdates? : LiveUpdatesOption } & TransactionOptions = {} ) : IOPromise<this> {
@@ -322,7 +335,7 @@ export class Collection< R extends Record = Record> extends Transactional implem
             options,
 
             json => {
-                let result : any = this.set( json, { parse : true, ...options } as TransactionOptions );
+                let result : any = this.set( json, { parse : true, ioMethod : 'fetch', ...options } as TransactionOptions );
                 
                 if( options.liveUpdates ){
                     result = this.liveUpdates( options.liveUpdates );
@@ -403,6 +416,7 @@ export class Collection< R extends Record = Record> extends Transactional implem
 
     // Apply bulk object update without any notifications, and return open transaction.
     // Used internally to implement two-phase commit.   
+    /** @internal */
     _createTransaction( a_elements : ElementsArg<R>, options : TransactionOptions = {} ) : CollectionTransaction | void {
         const elements = toElements( this, a_elements, options );
 
@@ -416,6 +430,7 @@ export class Collection< R extends Record = Record> extends Transactional implem
         }
     }
 
+    /** @internal */
     static _metatype = AggregatedType;
 
     /***********************************
@@ -464,6 +479,7 @@ export class Collection< R extends Record = Record> extends Transactional implem
         return next;
     }
 
+    /** @internal */
     _log( level : LogLevel, topic : string, text : string, value : object, a_logger? : Logger ) : void {
         ( a_logger || logger ).trigger( level, topic, `${ this.model.prototype.getClassName() }.${ this.getClassName() }: ` + text, {
             Argument : value,
@@ -505,7 +521,6 @@ export class Collection< R extends Record = Record> extends Transactional implem
         return model;
     }
 }
-
 
 import { ArrayMixin } from './arrayMethods'
 

@@ -1,6 +1,4 @@
 export interface IONode {
-    _endpoint: IOEndpoint;
-    _ioPromise: IOPromise<this>;
 }
 export interface IOPromise<T> extends Promise<T> {
     abort?: () => void;
@@ -15,7 +13,7 @@ export interface IOEndpoint {
     unsubscribe(events: IOEvents, collection?: any): void;
 }
 export interface IOOptions {
-    ioUpdate?: boolean;
+    ioMethod?: 'save' | 'fetch';
 }
 export interface IOEvents {
     updated?: (json: any) => void;

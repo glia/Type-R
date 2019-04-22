@@ -9,10 +9,7 @@ export interface ConstructorOptions extends TransactionOptions {
 export declare type AttributesConstructor = new (record: AttributesContainer, values: object, options: TransactionOptions) => AttributesValues;
 export declare type AttributesCopyConstructor = new (values: object) => AttributesValues;
 export interface AttributesContainer extends Transactional, Owner, ConstructorsMixin {
-    _attributes: AttributesDescriptors;
     attributes: AttributesValues;
-    _previousAttributes: AttributesValues;
-    _changedAttributes: AttributesValues;
 }
 export interface AttributesValues {
     [name: string]: any;

@@ -20,7 +20,7 @@ export interface ProxyIOInternalOptions {
 export class ProxyEndpoint implements IOEndpoint {
     Record : typeof Record
     get endpoint(){
-        return this.Record.prototype._endpoint;
+        return ( this.Record.prototype as any )._endpoint;
     }
 
     options : ProxyIOInternalOptions = {}

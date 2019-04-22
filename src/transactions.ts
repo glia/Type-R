@@ -34,7 +34,10 @@ export abstract class Transactional implements Messenger, IONode, Validatable, T
     // Mixins are hard in TypeScript. We need to copy type signatures over...
     // Here goes 'Mixable' mixin.
     static endpoint : IOEndpoint;
+    
+    /** @internal */
     static __super__ : object;
+    
     static mixins : MixinsState;
     static define : ( definition? : TransactionalDefinition, statics? : object ) => typeof Transactional;
     static extend : <T extends TransactionalDefinition>( definition? : T, statics? : object ) => any;
@@ -56,10 +59,12 @@ export abstract class Transactional implements Messenger, IONode, Validatable, T
         return new (this as any)( a, b );
     }
 
-    // State accessor. 
+    // State accessor.
+    /** @internal */
     readonly __inner_state__ : any;
 
     // Shared modifier (used by collections of shared models)
+    /** @internal */
     _shared? : number; 
     
     dispose() : void {
@@ -76,28 +81,28 @@ export abstract class Transactional implements Messenger, IONode, Validatable, T
     cidPrefix : string
 
     // Unique version token replaced on change
-    /** @private */
+    /** @internal */
     _changeToken : {} = {}
 
     // true while inside of the transaction
-    /** @private */
+    /** @internal */
     _transaction : boolean = false;
 
     // Holds current transaction's options, when in the middle of transaction and there're changes but is an unsent change event
-    /** @private */
+    /** @internal */
     _isDirty  : TransactionOptions = null;
 
     // Backreference set by owner (Record, Collection, or other object)
-    /** @private */
+    /** @internal */
     _owner : Owner = void 0;
 
     // Key supplied by owner. Used by record to identify attribute key.
     // Only collections doesn't set the key, which is used to distinguish collections.
-    /** @private */  
+    /** @internal */ 
     _ownerKey : string = void 0;
 
     // Name of the change event
-    /** @private */
+    /** @internal */
     _changeEventName : string
 
     /**
@@ -169,7 +174,7 @@ export abstract class Transactional implements Messenger, IONode, Validatable, T
     // Apply bulk object update without any notifications, and return open transaction.
     // Used internally to implement two-phase commit.
     // Returns null if there are no any changes.
-    /** @private */  
+    /** @internal */
     abstract _createTransaction( values : any, options? : TransactionOptions ) : Transaction | void
 
     // Apply bulk in-place object update in scope of ad-hoc transaction 
@@ -202,7 +207,7 @@ export abstract class Transactional implements Messenger, IONode, Validatable, T
     }
 
     // Store used when owner chain store lookup failed. Static value in the prototype. 
-    /** @private */
+    /** @internal */
     _defaultStore : Transactional
 
     // Locate the closest store. Store object stops traversal by overriding this method. 
@@ -218,12 +223,15 @@ export abstract class Transactional implements Messenger, IONode, Validatable, T
 
     // Loop through the members. Must be efficiently implemented in container class.
 
+    /** @internal */
     _endpoint : IOEndpoint
+    
+    /** @internal */
     _ioPromise : IOPromise<this>
 
     hasPendingIO() : IOPromise<this> { return this._ioPromise; }
 
-    fetch( options? : object ) : IOPromise<this> { throw new Error( "Not implemented" ); }
+    //fetch( options? : object ) : IOPromise<this> { throw new Error( "Not implemented" ); }
 
     getEndpoint() : IOEndpoint {
         return getOwnerEndpoint( this ) || this._endpoint;
@@ -234,7 +242,7 @@ export abstract class Transactional implements Messenger, IONode, Validatable, T
      */
 
     // Lazily evaluated validation error
-    /** @private */
+    /** @internal */
     _validationError : ValidationError = void 0
 
     // Validate ownership tree and return valudation error 
@@ -244,7 +252,7 @@ export abstract class Transactional implements Messenger, IONode, Validatable, T
     }
 
     // Validate nested members. Returns errors count.
-    /** @private */
+    /** @internal */
     abstract _validateNested( errors : ChildrenErrors ) : number
 
     // Object-level validator. Returns validation error.
@@ -282,6 +290,7 @@ export abstract class Transactional implements Messenger, IONode, Validatable, T
     }
 
     // Logging interface for run time errors and warnings.
+    /** @internal */
     abstract _log( level : LogLevel, topic : string, text : string, value : any, logger? : Logger ) : void
 }
 
@@ -293,7 +302,9 @@ export interface CloneOptions {
 // Owner must accept children update events. It's an only way children communicates with an owner.
 /** @private */
 export interface Owner extends Traversable, Messenger {
+    /** @internal */
     _onChildrenChange( child : Transactional, options : TransactionOptions ) : void;
+    
     getOwner() : Owner
     getStore() : Transactional
 }
@@ -336,8 +347,8 @@ export interface TransactionOptions {
 
     validate? : boolean
 
-    // `true` if the transaction is initiated as a result of IO operation
-    ioUpdate? : boolean
+    // IO method name if the transaction is initiated as a result of IO operation
+    ioMethod? : 'save' | 'fetch'
 
     // The hint for IOEndpoint
     // If `true`, `record.save()` will behave as "upsert" operation for the records having id.

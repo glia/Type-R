@@ -3,7 +3,9 @@ export interface ChildrenErrors {
 } 
 
 export interface Validatable {
+    /** @internal */
     _validateNested( errors : ChildrenErrors ) : number;
+    
     validate( self : any ) : any
     get( key : string ) : any
 }

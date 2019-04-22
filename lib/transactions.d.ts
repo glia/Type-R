@@ -1,7 +1,7 @@
 import { IOEndpoint, IONode, IOPromise } from './io-tools';
-import { Logger, LogLevel, Messenger, MessengerDefinition, MixinsState } from './object-plus';
+import { Logger, Messenger, MessengerDefinition, MixinsState } from './object-plus';
 import { Traversable } from './traversable';
-import { ChildrenErrors, Validatable, ValidationError } from './validation';
+import { Validatable, ValidationError } from './validation';
 export interface TransactionalDefinition extends MessengerDefinition {
     endpoint?: IOEndpoint;
 }
@@ -14,23 +14,14 @@ export interface Transactional extends Messenger {
 }
 export declare abstract class Transactional implements Messenger, IONode, Validatable, Traversable {
     static endpoint: IOEndpoint;
-    static __super__: object;
     static mixins: MixinsState;
     static define: (definition?: TransactionalDefinition, statics?: object) => typeof Transactional;
     static extend: <T extends TransactionalDefinition>(definition?: T, statics?: object) => any;
     static onDefine(definitions: TransactionalDefinition, BaseClass: typeof Transactional): void;
     static onExtend(BaseClass: typeof Transactional): void;
     static create(a: any, b?: any): Transactional;
-    readonly __inner_state__: any;
-    _shared?: number;
     dispose(): void;
     cidPrefix: string;
-    _changeToken: {};
-    _transaction: boolean;
-    _isDirty: TransactionOptions;
-    _owner: Owner;
-    _ownerKey: string;
-    _changeEventName: string;
     onChanges(handler: Function, target?: Messenger): void;
     offChanges(handler?: Function, target?: Messenger): void;
     listenToChanges(target: Transactional, handler: any): void;
@@ -41,23 +32,16 @@ export declare abstract class Transactional implements Messenger, IONode, Valida
     static from<T extends new (a?: any, b?: any) => Transactional>(this: T, json: any, { strict, ...options }?: {
         strict?: boolean;
     } & TransactionOptions): InstanceType<T>;
-    abstract _createTransaction(values: any, options?: TransactionOptions): Transaction | void;
     abstract set(values: any, options?: TransactionOptions): this;
     parse(data: any, options?: TransactionOptions): any;
     abstract toJSON(options?: object): {};
     abstract get(key: string): any;
     deepGet(reference: string): any;
     getOwner(): Owner;
-    _defaultStore: Transactional;
     getStore(): Transactional;
-    _endpoint: IOEndpoint;
-    _ioPromise: IOPromise<this>;
     hasPendingIO(): IOPromise<this>;
-    fetch(options?: object): IOPromise<this>;
     getEndpoint(): IOEndpoint;
-    _validationError: ValidationError;
     readonly validationError: ValidationError;
-    abstract _validateNested(errors: ChildrenErrors): number;
     validate(obj?: Transactional): any;
     getValidationError(key?: string): any;
     deepValidationError(reference: string): any;
@@ -66,13 +50,11 @@ export declare abstract class Transactional implements Messenger, IONode, Valida
     valueOf(): Object;
     toString(): string;
     getClassName(): string;
-    abstract _log(level: LogLevel, topic: string, text: string, value: any, logger?: Logger): void;
 }
 export interface CloneOptions {
     pinStore?: boolean;
 }
 export interface Owner extends Traversable, Messenger {
-    _onChildrenChange(child: Transactional, options: TransactionOptions): void;
     getOwner(): Owner;
     getStore(): Transactional;
 }
@@ -89,7 +71,7 @@ export interface TransactionOptions {
     reset?: boolean;
     unset?: boolean;
     validate?: boolean;
-    ioUpdate?: boolean;
+    ioMethod?: 'save' | 'fetch';
     upsert?: boolean;
 }
 export declare const transactionApi: {

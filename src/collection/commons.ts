@@ -9,16 +9,25 @@ const { trigger2, trigger3, on, off } = eventsApi,
 
 /** @private */
 export interface CollectionCore extends Transactional, Owner {
+    /** @internal */
     _byId : IdIndex
+
     models : Record[]
     model : typeof Record
     idAttribute : string // TODO: Refactor inconsistent idAttribute usage
+    
+    /** @internal */
     _comparator : Comparator
+    
     get( objOrId : string | Record | Object ) : Record    
+    
+    /** @internal */
     _itemEvents? : eventsApi.EventMap
+    /** @internal */
     _shared : number
+    /** @internal */
     _aggregationError : Record[]
-
+    /** @internal */
     _log( level : string, topic : string, text : string, value : any, logger : Logger ) : void
 }
 

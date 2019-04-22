@@ -1,5 +1,8 @@
 export interface IONode {
+    /** @internal */
     _endpoint : IOEndpoint
+
+    /** @internal */
     _ioPromise : IOPromise< this >
 }
 
@@ -18,7 +21,7 @@ export interface IOEndpoint {
 }
 
 export interface IOOptions {
-    ioUpdate? : boolean
+    ioMethod? : 'save' | 'fetch'
 }
 
 export interface IOEvents {
@@ -73,9 +76,6 @@ export type InitIOPromise = ( resolve : ( x? : any ) => void, reject : ( x? : an
 export function startIO( self : IONode, promise : IOPromise<any>, options : IOOptions, thenDo : ( json : any ) => any ) : IOPromise<any> {
     // Stop pending I/O first...
     abortIO( self );
-
-    // Mark future update transaction as IO transaction.
-    options.ioUpdate = true;
 
     self._ioPromise = promise
         .then( resp => {

@@ -18,15 +18,18 @@ export type AttributesCopyConstructor = new ( values : object ) => AttributesVal
 
 export interface AttributesContainer extends Transactional, Owner, ConstructorsMixin {
     // Attribute descriptors.
+    /** @internal */
     _attributes : AttributesDescriptors
 
     // Attribute values.
     attributes : AttributesValues
 
     // Previous attribute values.
+    /** @internal */
     _previousAttributes : AttributesValues
 
     // Changed attributes cache. 
+    /** @internal */
     _changedAttributes : AttributesValues
 }
 

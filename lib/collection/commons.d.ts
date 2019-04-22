@@ -1,17 +1,10 @@
-import { eventsApi, Logger } from '../object-plus';
 import { Record } from '../record';
 import { Owner, Transaction, Transactional, TransactionOptions } from '../transactions';
 export interface CollectionCore extends Transactional, Owner {
-    _byId: IdIndex;
     models: Record[];
     model: typeof Record;
     idAttribute: string;
-    _comparator: Comparator;
     get(objOrId: string | Record | Object): Record;
-    _itemEvents?: eventsApi.EventMap;
-    _shared: number;
-    _aggregationError: Record[];
-    _log(level: string, topic: string, text: string, value: any, logger: Logger): void;
 }
 export declare type Elements = (Object | Record)[];
 export interface CollectionOptions extends TransactionOptions {

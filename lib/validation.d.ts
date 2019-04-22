@@ -2,7 +2,6 @@ export interface ChildrenErrors {
     [key: string]: ValidationError | any;
 }
 export interface Validatable {
-    _validateNested(errors: ChildrenErrors): number;
     validate(self: any): any;
     get(key: string): any;
 }

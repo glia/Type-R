@@ -55,6 +55,7 @@ export interface RecordDefinition extends TransactionalDefinition {
     idAttribute : mixinRules.protoValue
 })
 export class Record extends Transactional implements IORecord, AttributesContainer, Iterable<any> {
+    /** @internal */
     static _metatype = AggregatedType;
 
     // Hack
@@ -84,30 +85,17 @@ export class Record extends Transactional implements IORecord, AttributesContain
     /********************
      * IO Methods
      */
+    /** @internal */
      _endpoints : { [ name : string ] : IOEndpoint }
-
-     // Save record
-     save( options? : object ) : IOPromise<this> { throw new Error( 'Implemented by mixin' ); }
-
-     // Destroy record
-     destroy( options? : object ) : IOPromise<this> { throw new Error( 'Implemented by mixin' ); }
 
     /***********************************
      * Core Members
      */
-    // Previous attributes
-    _previousAttributes : {}
-
     previousAttributes(){ return new this.AttributesCopy( this._previousAttributes ); } 
 
-    // Current attributes    
-    attributes : AttributesValues
-
     // Polymorphic accessor for aggregated attribute's canBeUpdated().
+    /** @internal */
     get __inner_state__(){ return this.attributes; }
-
-    // Lazily evaluated changed attributes hash
-    _changedAttributes : AttributesValues
 
     get changed(){
         let changed = this._changedAttributes;
@@ -217,8 +205,11 @@ export class Record extends Transactional implements IORecord, AttributesContain
      * Dynamically compiled stuff
      */
 
-    // Attributes specifications 
+    // Attributes specifications
+    /** @internal */
     _attributes : { [ key : string ] : AnyType }
+
+    /** @internal */
     _attributesArray : AnyType[]
 
     // Attributes object copy constructor
@@ -272,7 +263,7 @@ export class Record extends Transactional implements IORecord, AttributesContain
         return copy;
     }
 
-    // Validate attributes.
+    /** @internal */
     _validateNested( errors : ChildrenErrors ) : number {
         var length    = 0;
 
@@ -311,7 +302,7 @@ export class Record extends Transactional implements IORecord, AttributesContain
      */
 
     // Default record-level serializer, to be overriden by subclasses 
-    toJSON( options? : object ) : any {
+    toJSON( options? : TransactionOptions ) : any {
         const json = {},
             { attributes } = this;
 
@@ -406,6 +397,7 @@ export class Record extends Transactional implements IORecord, AttributesContain
         super.dispose();
     }
 
+    /** @internal */
     _log( level : LogLevel, topic: string, text : string, props : object, a_logger? : Logger ) : void {
         ( a_logger || logger ).trigger( level, topic, this.getClassName() + ' ' + text, {
             ...props,
@@ -418,10 +410,12 @@ export class Record extends Transactional implements IORecord, AttributesContain
         return super.getClassName() || 'Record';
     }
 
-    // Dummies to 
+    /** @internal */
     _createTransaction( values : object, options : TransactionOptions ) : Transaction { return void 0; }
     // Simulate attribute change 
     forceAttributeChange : ( key : string, options : TransactionOptions ) => void
+
+    /** @internal */
     _onChildrenChange : ( child : Transactional, options : TransactionOptions ) => void
 
 
@@ -461,6 +455,10 @@ export class Record extends Transactional implements IORecord, AttributesContain
         return keys;
     }
 };
+
+export interface Record extends IORecord {}
+export interface Record extends AttributesContainer {}
+
 
 assign( Record.prototype, UpdateRecordMixin, IORecordMixin );
 
