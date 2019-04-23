@@ -33,11 +33,27 @@ export abstract class ArrayMixin<R extends Record> {
     }
 
     /**
+     * Iterate through the collection.
+     * @param context optional `this` for `iteratee`.
+     */
+    each<T>( fun : ( val : R, key? : number ) => any, context? : any ) : void {
+        const { models } = this,
+            { length } = models,
+            iteratee = context ? fun.bind( context ) : fun;
+
+        for( let i = 0; i < length; i++ ){
+            iteratee( models[ i ], i );
+        }
+    }
+
+    /**
      * Iterate through collection optionally returning the value.
      * @param doWhile break the loop if anything but `undefined` is returned, and return this value.
      * @param context optional `this` for `doWhile`.
      */
-    each<T>( doWhile : ( val : R, key? : number ) => T, context? : any ) : T {
+    firstMatch<T>( doWhile : ( val : R, key? : number ) => T ) : T
+    firstMatch<T, C>( doWhile : ( this : C, val : R, key? : number ) => T, context : C ) : T
+    firstMatch<T>( doWhile : ( val : R, key? : number ) => T, context? : any ) : T {
         const { models } = this,
             { length } = models,
             iteratee = context ? doWhile.bind( context ) : doWhile;
@@ -78,7 +94,7 @@ export abstract class ArrayMixin<R extends Record> {
 
     find( iteratee : Predicate<R>, context? : any ) : R {
         const fun = toPredicateFunction( iteratee );
-        return this.each( m => fun( m ) ? m : void 0, context );
+        return this.firstMatch( m => fun( m ) ? m : void 0, context );
     }
 
     some( iteratee : Predicate<R>, context? : any ) : boolean {
@@ -99,7 +115,7 @@ export abstract class ArrayMixin<R extends Record> {
 
     every( iteratee : Predicate<R>, context? : any ) : boolean {
         const fun = toPredicateFunction( iteratee );
-        return this.each( m => fun( m ) ? void 0 : false, context ) === void 0;
+        return this.firstMatch( m => fun( m ) ? void 0 : false, context ) === void 0;
     }
 
     pluck<K extends keyof R>( key : K ) : R[K][] {

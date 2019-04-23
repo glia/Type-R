@@ -5,10 +5,8 @@ import { omit, transform } from './tools';
 
 const { strings, on, off, once, trigger5, trigger2, trigger3 } = _eventsApi;
 
-/** @hidden */
 let _idCount = 0;
 
-/** @hidden */
 function uniqueId() : string {
     return 'l' + _idCount++;
 }
@@ -28,12 +26,10 @@ export interface PropertyMap {
 
 export type Property = PropertyDescriptor | ( () => any )
 
-/** @hidden */
 export interface MessengersByCid {
     [ cid : string ] : Messenger
 }
 
-/** @hidden */
 export type EventCallbacks<Context> = { [ events : string ] : EventCallback<Context> }
 export type EventCallback<Context> = ( this : Context, ...args : any[] ) => void
 
@@ -49,6 +45,7 @@ export type EventCallback<Context> = ( this : Context, ...args : any[] ) => void
 })
 export class Messenger implements Mixable, EventSource {
     // Define extendable mixin static properties.
+    /** @internal */
     static __super__ : object;
     static mixins : MixinsState;
     static onExtend : ( BaseClass : Function ) => void;
@@ -71,19 +68,18 @@ export class Messenger implements Mixable, EventSource {
         }
     }
 
-    /** @hidden */ 
+    /** @internal */ 
     _events : HandlersByEvent = void 0;
 
-    /** @hidden */ 
+    /** @internal */ 
     _listeningTo : MessengersByCid = void 0
 
     /** Unique client-only id. */
     cid : string
 
-    /** @hidden Prototype-only property to manage automatic local events subscription */ 
+    /** @internal Prototype-only property to manage automatic local events subscription */ 
     _localEvents : EventMap
 
-    /** @hidden */ 
     constructor(){
         this.cid = uniqueId();
         this.initialize.apply( this, arguments );
@@ -199,7 +195,6 @@ function toPropertyDescriptor( x : Property ) : PropertyDescriptor {
     }
 }
 
-/** @hidden */
 function addReference( listener : Messenger, source : Messenger ){
       const listeningTo = listener._listeningTo || (listener._listeningTo = Object.create( null ) ),
             cid = source.cid || ( source.cid = uniqueId() );

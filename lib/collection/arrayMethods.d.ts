@@ -4,7 +4,9 @@ export declare abstract class ArrayMixin<R extends Record> {
     models: R[];
     abstract get(modelOrId: string | Partial<R>): R;
     map<T>(mapFilter: (val: R, key?: number) => T, context?: any): T[];
-    each<T>(doWhile: (val: R, key?: number) => T, context?: any): T;
+    each<T>(fun: (val: R, key?: number) => any, context?: any): void;
+    firstMatch<T>(doWhile: (val: R, key?: number) => T): T;
+    firstMatch<T, C>(doWhile: (this: C, val: R, key?: number) => T, context: C): T;
     reduce<T>(iteratee: (previousValue: R, currentValue: R, currentIndex?: number) => R): R;
     reduce<T>(iteratee: (previousValue: T, currentValue: R, currentIndex?: number) => T, init?: any): T;
     slice(begin?: number, end?: number): R[];

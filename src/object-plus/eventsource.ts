@@ -10,12 +10,11 @@ import { once as _once } from './tools'
  *      'executedInNativeContext' : '^props.handler'
  * })
  */
-/** @hidden */
 export interface EventsDefinition {
     [ events : string ] : Function | string | boolean
 }
 
-/** @hidden */
+
 export class EventMap {
     handlers : EventDescriptor[] = [];
 
@@ -67,7 +66,6 @@ export class EventMap {
     }
 }
 
-/** @hidden */
 export class EventDescriptor {
     callback : Function
 
@@ -91,10 +89,8 @@ export class EventDescriptor {
     }
 }
 
-/** @hidden */
 const _bubblingHandlers = {};
 
-/** @hidden */
 function getBubblingHandler( event : string ){
     return _bubblingHandlers[ event ] || (
         _bubblingHandlers[ event ] = function( a?, b?, c?, d?, e? ){
@@ -105,17 +101,14 @@ function getBubblingHandler( event : string ){
     );
 }
 
-/** @hidden */
 export interface HandlersByEvent {
     [ name : string ] : EventHandler
 }
 
-/** @hidden */
 export class EventHandler {
     constructor( public callback : Callback, public context : any, public next = null ){}
 }
 
-/** @hidden */
 function listOff( _events : HandlersByEvent, name : string, callback : Callback, context : any ){
     const head = _events[ name ];
 
@@ -138,37 +131,31 @@ function listOff( _events : HandlersByEvent, name : string, callback : Callback,
     if( head !== filteredHead ) _events[ name ] = filteredHead;
 }
 
-/** @hidden */
 function listSend2( head : EventHandler, a, b ){
     for( let ev = head; ev; ev = ev.next ) ev.callback.call( ev.context, a, b );
 }
 
-/** @hidden */
 function listSend3( head : EventHandler, a, b, c ){
     for( let ev = head; ev; ev = ev.next ) ev.callback.call( ev.context, a, b, c );
 }
 
-/** @hidden */
 function listSend4( head : EventHandler, a, b, c, d ){
     for( let ev = head; ev; ev = ev.next ) ev.callback.call( ev.context, a, b, c, d );
 }
 
-/** @hidden */
 function listSend5( head : EventHandler, a, b, c, d, e ){
     for( let ev = head; ev; ev = ev.next ) ev.callback.call( ev.context, a, b, c, d, e );
 }
 
-/** @hidden */
 function listSend6( head : EventHandler, a, b, c, d, e, f ){
     for( let ev = head; ev; ev = ev.next ) ev.callback.call( ev.context, a, b, c, d, e, f );
 }
 
-/** @hidden */
 export interface Callback extends Function {
     _callback? : Function
 }
 
-/** @hidden */
+/** @internal */
 export function on( source : EventSource, name : string, callback : Callback, context? : any ) : void {
     if( callback ){
         const _events = source._events || ( source._events = Object.create( null ) );
@@ -176,7 +163,7 @@ export function on( source : EventSource, name : string, callback : Callback, co
     }
 }
 
-/** @hidden */
+/** @internal */
 export function once( source : EventSource, name : string, callback : Callback, context? : any ) : void {
     if( callback ){
         const once : Callback = _once( function(){
@@ -189,7 +176,7 @@ export function once( source : EventSource, name : string, callback : Callback, 
     }
 }
 
-/** @hidden */
+/** @internal */
 export function off( source : EventSource, name? : string, callback? : Callback, context? : any ) : void {
     const { _events } = source;
     if( _events ){
@@ -212,15 +199,14 @@ export function off( source : EventSource, name? : string, callback? : Callback,
     }
 }
 
-/** @hidden */
 export interface EventSource {
+    /** @internal */
     _events : HandlersByEvent
 }
 
-/** @hidden */
 const eventSplitter = /\s+/;
 
-/** @hidden */
+/** @internal */
 export function strings( api : ApiEntry, source : EventSource, events : string, callback : Callback, context ){
     if( eventSplitter.test( events ) ){
         const names = events.split( eventSplitter );
@@ -229,14 +215,14 @@ export function strings( api : ApiEntry, source : EventSource, events : string, 
     else api( source, events, callback, context );
 }
 
-/** @hidden */
+/** @internal */
 export type ApiEntry = ( source : EventSource, event : string, callback : Callback, context? : any ) => void
 
 /*********************************
  * Event-triggering API
  */
 
-/** @hidden */
+/** @internal */
 export function trigger2( self : EventSource, name : string, a, b ) : void {
     const { _events } = self;
     if( _events ){
@@ -248,7 +234,7 @@ export function trigger2( self : EventSource, name : string, a, b ) : void {
     }
 };
 
-/** @hidden */
+/** @internal */
 export function trigger3( self : EventSource, name : string, a, b, c ) : void{
     const { _events } = self;
     if( _events ){
@@ -260,7 +246,7 @@ export function trigger3( self : EventSource, name : string, a, b, c ) : void{
     }
 };
 
-/** @hidden */
+/** @internal */
 export function trigger5( self : EventSource, name : string, a, b, c, d, e ) : void{
     const { _events } = self;
     if( _events ){

@@ -1,4 +1,4 @@
-import { EventMap, EventsDefinition, EventSource, HandlersByEvent } from './eventsource';
+import { EventMap, EventsDefinition, EventSource } from './eventsource';
 import { Mixable, MixableConstructor, MixinsState } from './mixins';
 export { EventMap, EventsDefinition };
 export interface MessengerDefinition {
@@ -19,16 +19,12 @@ export declare type EventCallbacks<Context> = {
 };
 export declare type EventCallback<Context> = (this: Context, ...args: any[]) => void;
 export declare class Messenger implements Mixable, EventSource {
-    static __super__: object;
     static mixins: MixinsState;
     static onExtend: (BaseClass: Function) => void;
     static define: (definition?: MessengerDefinition, statics?: object) => MixableConstructor;
     static extend: (definition?: MessengerDefinition, statics?: object) => MixableConstructor;
     static onDefine({ localEvents, _localEvents, properties }: MessengerDefinition, BaseClass?: typeof Mixable): void;
-    _events: HandlersByEvent;
-    _listeningTo: MessengersByCid;
     cid: string;
-    _localEvents: EventMap;
     constructor();
     initialize(): void;
     on(events: string | EventCallbacks<this>, callback?: any, context?: any): this;

@@ -70,7 +70,6 @@ export function isEmpty( obj : {} ) : boolean {
 
 export type Iteratee = ( value : any, key? : string | number ) => any;
 
-/** @hidden */
 function someArray( arr : any[], fun : Iteratee ) : any {
     let result;
 
@@ -81,7 +80,6 @@ function someArray( arr : any[], fun : Iteratee ) : any {
     }
 }
 
-/** @hidden */
 function someObject( obj : {}, fun : Iteratee ) : any {
     let result;
 
@@ -152,7 +150,6 @@ export function transform< A, B >( dest : { [ key : string ] : A }, source : { [
     return dest;
 }
 
-/** @hidden */
 export function fastAssign< A >( dest : A, source : {} ) : A {
     for( var name in source ) {
         dest[ name ] = source[ name ];
@@ -161,7 +158,6 @@ export function fastAssign< A >( dest : A, source : {} ) : A {
     return dest;
 }
 
-/** @hidden */
 export function fastDefaults< A >( dest : A, source : {} ) : A {
     for( var name in source ) {
         if( dest[ name ] === void 0 ){
@@ -209,7 +205,6 @@ export function once( func : Function ) : Function {
     };
 }
 
-/** @hidden */
 const ArrayProto = Array.prototype,
       DateProto = Date.prototype,
       ObjectProto = Object.prototype;
@@ -239,7 +234,6 @@ export function notEqual( a : any, b : any) : boolean {
     return true;
 }
 
-/** @hidden */
 function objectsNotEqual( a, b ) {
     const keysA = Object.keys( a );
 
@@ -256,7 +250,6 @@ function objectsNotEqual( a, b ) {
     return false;
 }
 
-/** @hidden */
 function arraysNotEqual( a, b ) {
     if( a.length !== b.length ) return true;
 
