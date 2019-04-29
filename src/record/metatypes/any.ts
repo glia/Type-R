@@ -127,7 +127,7 @@ export class AnyType implements AttributeUpdatePipeline {
     // Used as global default value for the given metatype
     static defaultValue : any;
 
-    type : Function
+    type : any
 
     initialize( name : string, options : TransactionOptions ){}
 

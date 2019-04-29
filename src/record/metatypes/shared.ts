@@ -1,6 +1,7 @@
 import { eventsApi } from '../../object-plus';
 import { ItemsBehavior, Transactional, transactionApi, TransactionOptions } from '../../transactions';
 import { AnyType } from './any';
+import { type } from '../attrDef'
 import { AttributesContainer, ConstructorOptions } from '../updates';
 import { ChainableAttributeSpec } from '../attrDef';
 
@@ -17,9 +18,14 @@ const { on, off } = eventsApi,
 
 const shareAndListen = ItemsBehavior.listen | ItemsBehavior.share;
 
+function getType(input: any) {
+    return input.type.options ? input.type.options.type : input.type;
+}
+
 /** @private */
 export class SharedType extends AnyType {
-    type : typeof Transactional
+    //type : ChainableAttributeSpec<Function>
+    type : typeof Transactional | ChainableAttributeSpec<Function>
 
      doInit( value, record : AttributesContainer, options : ConstructorOptions ){
         const v = options.clone ? this.clone( value, record ) : (
@@ -81,13 +87,15 @@ export class SharedType extends AnyType {
 
     canBeUpdated( prev : Transactional, next : any, options : TransactionOptions ) : any {
         // If an object already exists, and new value is of incompatible type, let object handle the update.
-        if( prev && next != null && !( next instanceof this.type ) ){
+        let type = getType(this);
+        if( prev && next != null && !( next instanceof type ) ){
             return next;
         }
     }
 
     convert( next : any, prev : any, record : AttributesContainer, options : TransactionOptions ) : Transactional {
-        if( next == null || next instanceof this.type ) return next;
+        let type = getType(this);
+        if( next == null || next instanceof type ) return next;
 
         // Convert type using implicitly created transactional object.
         const implicitObject = new ( this.type as any )( next, options, shareAndListen );
