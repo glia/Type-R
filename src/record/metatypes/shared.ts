@@ -18,8 +18,11 @@ const { on, off } = eventsApi,
 
 const shareAndListen = ItemsBehavior.listen | ItemsBehavior.share;
 
-function getType(input: any) {
-    return input.type.options ? input.type.options.type : input.type;
+function getType(attr: any) {
+    while (attr && attr.options && attr.options.type) {
+        attr = attr.options.type;
+    }
+    return attr;
 }
 
 /** @private */
