@@ -73,6 +73,7 @@ export interface TransactionOptions {
     validate?: boolean;
     ioMethod?: 'save' | 'fetch';
     upsert?: boolean;
+    lazyRelations?: boolean;
 }
 export declare const transactionApi: {
     begin(object: Transactional): boolean;

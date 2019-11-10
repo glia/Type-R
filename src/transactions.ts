@@ -353,6 +353,8 @@ export interface TransactionOptions {
     // The hint for IOEndpoint
     // If `true`, `record.save()` will behave as "upsert" operation for the records having id.
     upsert? : boolean
+
+    lazyRelations? : boolean
 }
 
 /**

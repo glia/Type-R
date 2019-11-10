@@ -98,15 +98,21 @@ export class SharedType extends AnyType {
 
     convert( next : any, prev : any, record : AttributesContainer, options : TransactionOptions ) : Transactional {
         let type = getType(this);
-        if( next == null || next instanceof type ) return next;
+        if (next == null || next instanceof type || options.lazyRelations) return next;
 
-        // Convert type using implicitly created transactional object.
-        const implicitObject = new ( type as any )( next, options, shareAndListen );
+        next = type.create(next, options, shareAndListen);
+        
+        /*
+        if (!next) {
+            // Convert type using implicitly created transactional object.
+            next = new (type as any)(next, options, shareAndListen);
 
-        // To prevent a leak, we need to take an ownership on it.
-        aquire( record, implicitObject, this.name );
+            // To prevent a leak, we need to take an ownership on it.
+            aquire(record, next, this.name);
+        }
+        */
 
-        return implicitObject;
+        return next;
     }
 
     // Refs are always valid.
